@@ -1,1 +1,69 @@
+server:
+  port: 6543
 
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: TtuckTakServer
+  datasource:
+    url: jdbc:mysql://database-1.cekg2t7qwqmr.ap-northeast-2.rds.amazonaws.com:3306/TtukTtak
+    username: admin
+    password: q3143118
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+        ddl-auto: validate
+        implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    open-in-view: false
+    show-sql: true
+    database: mysql
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+#  config:
+#    import: classpath:/secret.yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  application:
+    name: TtuckTakServer
+  datasource:
+    url: jdbc:h2:mem:testDB
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: true
+        ddl-auto: create
+        implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    open-in-view: false
+    show-sql: true
+    database: h2
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  sql:
+    init:
+      encoding: utf-8
+#  config:
+#    import: classpath:/secret.yml
