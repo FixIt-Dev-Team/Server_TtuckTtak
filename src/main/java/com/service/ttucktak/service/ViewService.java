@@ -1,2 +1,7 @@
-package com.service.ttucktak.service;public class ViewService {
+package com.service.ttucktak.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ViewService {
 }

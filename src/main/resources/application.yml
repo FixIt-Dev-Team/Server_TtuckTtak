@@ -5,6 +5,7 @@ spring:
   config:
     activate:
       on-profile: dev
+    import: classpath:/secret.yml
   application:
     name: TtuckTakServer
   datasource:
@@ -30,8 +31,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-#  config:
-#    import: classpath:/secret.yml
 
 ---
 
@@ -39,11 +38,14 @@ spring:
   config:
     activate:
       on-profile: test
+    import: classpath:/secret.yml
   application:
     name: TtuckTakServer
   datasource:
     url: jdbc:h2:mem:testDB
     driver-class-name: org.h2.Driver
+    username: sa
+    password: 1234
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     properties:
@@ -65,5 +67,3 @@ spring:
   sql:
     init:
       encoding: utf-8
-#  config:
-#    import: classpath:/secret.yml
