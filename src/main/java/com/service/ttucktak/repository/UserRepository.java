@@ -8,4 +8,18 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+    UserEntity findUserEntityByUserIdx(UUID userIdx);
+
+    boolean existsUserEntityByUserIdx(UUID userIdx);
+
+    boolean existsUserEntityByUserID(String userID);
+
+//    @Modifying
+//    @Transactional
+//    @Query(value = "insert into Users (userIdx, userID, userPW, userName, email, birthday, accountType) " +
+//            "values(:#{#entity.userIdx}, #{#entity.userID}, :#{#entity.userPW}, :#{#entity.userName}, :#{#entity.email}, :#{#entity.birthday}, :#{#entity.accountType})", nativeQuery = true)
+//    void insertNewUser(
+//            @Param("entity") UserEntity entity
+//    );
+
 }

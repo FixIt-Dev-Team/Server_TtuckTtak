@@ -1,19 +1,20 @@
 package com.service.ttucktak.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.UUID;
 import java.util.Date;
 
 @DynamicInsert
 @DynamicUpdate
-@Entity(name = "Users")
+@Entity(name = "users")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor
 public class UserEntity {
@@ -42,17 +43,27 @@ public class UserEntity {
     @Column(name = "accountType", nullable = false)
     private Integer accountType; // 계정 타입
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "createdAt", nullable = false)// 기본값 지정
-    @Temporal(TemporalType.TIMESTAMP) // MySQL에 맞게 타입지정
+    @Column(name = "createdAt")// 기본값 지정
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt; // Row 생성 시점
 
-    @ColumnDefault("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP") // 기본값 지정
-    @Column(name = "updatedAt", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP) // MySQL에 맞게 타입지정
+    @Column(name = "updatedAt")
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt; // Row 업데이트 시점
 
-    @ColumnDefault("true")
-    @Column(name = "status", nullable = false)
-    private Boolean status; // Row 유효 상태
+    @Column(name = "status")
+    private Boolean status = true; // Row 유효 상태
+
+    @Builder
+    public UserEntity(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType) {
+        this.userID = userID;
+        this.userPW = userPW;
+        this.userName = userName;
+        this.email = email;
+        this.birthday = birthday;
+        this.validation = validation;
+        this.accountType = accountType;
+    }
 }
