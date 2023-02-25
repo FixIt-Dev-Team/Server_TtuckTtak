@@ -3,9 +3,11 @@ package com.service.ttucktak.repository;
 import com.service.ttucktak.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.UUID;
 
+@ApiIgnore
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     UserEntity findUserEntityByUserIdx(UUID userIdx);

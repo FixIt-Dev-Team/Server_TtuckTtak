@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BaseErrorCode {
 
+
     /**
      * 1000 ~ 1500
      * Auth Token Error
@@ -17,6 +18,16 @@ public enum BaseErrorCode {
     UNSUPPORTED_TOKEN(1003, "지원하지 않는 토큰입니다."),
     TOKEN_NOT_EXIST(1004, "토큰이 존재하지 않습니다."),
 
+    /**
+     * 1501 ~ 1999
+     * Auth Controller Error
+     * */
+    PW_TOO_SHORT(1501, "비밀번호가 너무 짧습니다."),
+    PW_TOO_LONG(1502, "비밀번호가 너무 깁니다."),
+    ID_TOO_SHORT(1503, "유저 아이디가 너무 짧습니다"),
+    ID_TOO_LONG(1504, "유저 아이디가 너무 깁니다."),
+    INVALID_EMAIL(1505, "이메일 형식에 맞지 않습니다."),
+    INVALID_BIRTHDAY(1506, "생일 형식에 맞지 않습니다 yyy-MM-dd"),
     /**
      * 9000 Database Error
      * */

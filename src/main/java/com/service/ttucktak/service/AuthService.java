@@ -8,6 +8,7 @@ import com.service.ttucktak.entity.ProfileEntity;
 import com.service.ttucktak.entity.UserEntity;
 import com.service.ttucktak.repository.ProfileRepository;
 import com.service.ttucktak.repository.UserRepository;
+import com.service.ttucktak.utils.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class AuthService {
     public PostSigninResDto createUsers(PostSigninReqDto postSigninReqDto) throws BaseException {
 
         try{
+            postSigninReqDto.setUserPW(SHA256.encrypt(postSigninReqDto.getUserPW()));
             UserEntity entity = postSigninReqDto.toEntity(false);
 
             UUID userIdx = userRepository.save(entity).getUserIdx();

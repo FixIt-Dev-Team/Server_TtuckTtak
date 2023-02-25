@@ -2,16 +2,20 @@ package com.service.ttucktak.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
+@ApiIgnore
+@DynamicInsert
+@DynamicUpdate
 @Entity(name = "Friend")
+@Table(name = "Friend")
 @Getter
 @NoArgsConstructor
 public class FriendEntity {

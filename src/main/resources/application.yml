@@ -31,39 +31,3 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-
-#---
-#
-#spring:
-#  config:
-#    activate:
-#      on-profile: test
-#    import: classpath:/secret.yml
-#  application:
-#    name: TtuckTakServer
-#  datasource:
-#    url: jdbc:h2:mem:testDB;MODE=MYSQL
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    password: 1234
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    properties:
-#      hibernate:
-#        format_sql: true
-#        ddl-auto: create
-#        implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-#        physical_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-#    open-in-view: false
-#    show-sql: true
-#    database: h2
-#  mvc:
-#    pathmatch:
-#      matching-strategy: ant_path_matcher
-#  servlet:
-#    multipart:
-#      max-file-size: 100MB
-#      max-request-size: 100MB
-#  sql:
-#    init:
-#      encoding: utf-8
