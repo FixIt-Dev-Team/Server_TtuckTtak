@@ -1,4 +1,4 @@
-package com.service.ttucktak.socialService;
+package com.service.ttucktak.oAuthService;
 
 import org.springframework.stereotype.Service;
 
