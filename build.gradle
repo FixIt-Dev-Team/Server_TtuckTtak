@@ -22,10 +22,13 @@ dependencies {
 
     //Starter
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    //OAuth
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     //Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -61,6 +64,15 @@ dependencies {
 
     //Json
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    //logger
+    implementation 'org.slf4j:slf4j-api:1.7.31'
+    implementation 'ch.qos.logback:logback-core:1.2.3'
+
+    implementation ('ch.qos.logback:logback-classic:1.2.3'){
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+    }
 }
 
 tasks.named('test') {
