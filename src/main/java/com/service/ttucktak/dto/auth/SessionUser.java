@@ -1,7 +1,5 @@
 package com.service.ttucktak.dto.auth;
 
-import com.service.ttucktak.base.Role;
-import com.service.ttucktak.dto.user.UserDomain;
 import com.service.ttucktak.entity.UserEntity;
 import lombok.Getter;
 

@@ -2,12 +2,21 @@ package com.service.ttucktak.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
 public enum BaseErrorCode {
 
+    /**
+     * 404 - NOT FOUND
+     * */
+    KAKAO_EMAIL_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "카카오 이메일 동의가 필요합니다."),
 
+    /**
+     * 500 INTERNAL SERVER ERROR
+     * */
+    KAKAO_OAUTH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 로그인 중 오류발생 서버에 문의"),
     /**
      * 1000 ~ 1500
      * Auth Token Error

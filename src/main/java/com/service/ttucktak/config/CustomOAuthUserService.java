@@ -4,9 +4,12 @@ import com.service.ttucktak.dto.auth.OAuthAttribute;
 import com.service.ttucktak.dto.auth.SessionUser;
 import com.service.ttucktak.entity.UserEntity;
 import com.service.ttucktak.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -14,7 +17,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+
+
 import java.text.ParseException;
 
 /**
@@ -43,8 +47,10 @@ public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserReque
 
         UserEntity user = saveOrUpdate(attribute);
 
+        logger.info("in");
         httpSession.setAttribute("user", new SessionUser(user));
-        return null;
+
+        return oAuth2User;
     }
 
     private UserEntity saveOrUpdate(OAuthAttribute attribute){

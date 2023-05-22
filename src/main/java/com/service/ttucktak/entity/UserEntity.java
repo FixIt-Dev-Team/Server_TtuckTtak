@@ -1,21 +1,19 @@
 package com.service.ttucktak.entity;
 
 import com.service.ttucktak.base.Role;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 import java.util.Date;
 
-@ApiIgnore
 @DynamicInsert
 @DynamicUpdate
 @Entity(name = "users")
