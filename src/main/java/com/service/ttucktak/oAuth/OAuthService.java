@@ -1,6 +1,5 @@
 package com.service.ttucktak.oAuth;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.service.ttucktak.base.BaseErrorCode;
@@ -18,7 +17,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,6 +30,9 @@ public class OAuthService {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirectUri;
 
+    /**
+     * 카카오 토큰받기
+     * */
     public String getKakaoAccessToken(String authCode){
         String accessToken = "";
 
@@ -79,6 +80,9 @@ public class OAuthService {
         return accessToken;
     }
 
+    /**
+     * 카카오 정보 받기
+     * */
     public KakaoUserDto getKakaoUserInfo(String authToken) throws BaseException{
         try{
             //Target URL
@@ -114,10 +118,11 @@ public class OAuthService {
             else throw new BaseException(BaseErrorCode.KAKAO_EMAIL_NOT_EXIST);
 
             String birthday = object.get("kakao_account").getAsJsonObject().get("birthday").getAsString();
-            birthday += "1998";
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = format.parse(birthday);
+
+            String[] temp = birthday.split("");
+            Date date = format.parse("1998" + "-" + temp[0] + temp[1] + "-" + temp[2] + temp[3]);
 
             String nickName = object.get("kakao_account")
                     .getAsJsonObject().get("profile")

@@ -13,8 +13,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-    @Autowired
+
     private final CustomOAuthUserService customOAuthUserService;
+
+    @Autowired
+    public SecurityConfig(CustomOAuthUserService customOAuthUserService) {
+        this.customOAuthUserService = customOAuthUserService;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception{
