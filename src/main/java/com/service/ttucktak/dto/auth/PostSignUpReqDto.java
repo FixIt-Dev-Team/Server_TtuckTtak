@@ -1,6 +1,7 @@
 package com.service.ttucktak.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.service.ttucktak.base.Role;
 import com.service.ttucktak.entity.Users;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,6 +38,7 @@ public class PostSignUpReqDto {
                 .birthday(birthday)
                 .validation(validation)
                 .accountType(accountType)
+                .role(Role.ROLE_USER)
                 .build();
     }
 }

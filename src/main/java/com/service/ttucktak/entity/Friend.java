@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import org.springframework.context.annotation.Lazy;
 
 
 import java.util.Date;
@@ -12,8 +13,8 @@ import java.util.UUID;
 
 @DynamicInsert
 @DynamicUpdate
-@Entity(name = "Friend")
-@Table(name = "Friend")
+@Entity(name = "friend")
+@Table(name = "friend")
 @Getter
 @NoArgsConstructor
 public class Friend {

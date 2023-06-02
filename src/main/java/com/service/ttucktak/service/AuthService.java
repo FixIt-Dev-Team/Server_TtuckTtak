@@ -40,7 +40,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostSignUpResDto createUsers(PostSignUpReqDto postSignUpReqDto) throws BaseException {
 
         try{
@@ -67,18 +67,17 @@ public class AuthService {
         return new PostSignUpResDto(true);
     }
 
-    @Transactional
     public TokensDto loginToken(String userID, String userPW){
 
+        log.error("1");
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userID, userPW);
-
+        log.error("2");
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
+        log.error("3");
         return jwtUtil.createTokens(authentication);
 
     }
 
-    @Transactional
     public UUID loginUserIdx(String userID) throws BaseException {
         Optional<UUID> userIdx = userRepository.findUserIdxByUserID(userID);
         userIdx.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));

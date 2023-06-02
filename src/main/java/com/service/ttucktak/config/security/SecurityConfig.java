@@ -6,6 +6,7 @@ import com.service.ttucktak.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,22 +28,24 @@ public class SecurityConfig {
         this.jwtUtil = jwtUtil;
     }
 
+    @Order(1)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception{
+
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil);
+
         http
                 .csrf().disable()//csrf (사이트간 위조 요청) 비활성화
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)// 토큰으로 인증하므로 stateless
                 .and()
                 .formLogin().disable()//Form Based Authentication 을 사용하지 않음
-                .httpBasic().disable()//  HTTP Basic Authentication 을 사용하지 않음
+                .httpBasic().disable()// HTTP Basic Authentication 을 사용하지 않음
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeHttpRequests() //Http Request를 인가하라
-                .requestMatchers("/api/auths/**").permitAll()// 이쪽은 그냥 허용
-                .requestMatchers("/api/admins/**").hasRole("ROLE_ADMIN") //이쪽은 ADMIN만 접근이 가능하다.
                 .anyRequest().authenticated()// 이외의 접근은 인증이 필요하다
                 .and()//그리고
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)// Jwt 필터를 추가한다.
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)// Jwt 필터를 추가한다.
                 .oauth2Login() //OAuth Login은 다음과 같다
                 .userInfoEndpoint()
                 .userService(customOAuthUserService);

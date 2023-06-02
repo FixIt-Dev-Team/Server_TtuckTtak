@@ -49,7 +49,6 @@ public class AuthController {
             if(postSignUpReqDto.getUserID().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
             //생일 형식 validation
             if(!RegexUtil.isValidDateFormat(postSignUpReqDto.getBirthday())) throw new BaseException(BaseErrorCode.INVALID_BIRTHDAY);
-            System.out.println(postSignUpReqDto.getUserID());
             PostSignUpResDto response = authService.createUsers(postSignUpReqDto);
 
             return new BaseResponse<>(response);
@@ -61,10 +60,12 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/login")
     public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req){
         try{
+            log.debug("1");
             TokensDto tokensDto = authService.loginToken(req.getUserId(), req.getUserPw());
-
+            log.debug("2");
             UUID userIdx = authService.loginUserIdx(req.getUserId());
 
             return new BaseResponse<>(new PostLoginRes(userIdx.toString(), tokensDto));
