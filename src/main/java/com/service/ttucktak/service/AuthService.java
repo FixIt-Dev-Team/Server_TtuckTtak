@@ -67,14 +67,19 @@ public class AuthService {
         return new PostSignUpResDto(true);
     }
 
-    public TokensDto loginToken(String userID, String userPW){
+    public TokensDto loginToken(String userID, String userPW) throws BaseException {
 
-        log.error("1");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userID, userPW);
-        log.error("2");
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        log.error("3");
-        return jwtUtil.createTokens(authentication);
+        try{
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userID, userPW);
+
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+            return jwtUtil.createTokens(authentication);
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
+        }
+
 
     }
 

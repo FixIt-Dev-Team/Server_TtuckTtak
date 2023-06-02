@@ -22,6 +22,7 @@ public enum BaseErrorCode {
     ID_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 깁니다."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
+    LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "아이디나 비밀번호를 확인해주세요"),
 
     /**
      * 404 - NOT FOUND
