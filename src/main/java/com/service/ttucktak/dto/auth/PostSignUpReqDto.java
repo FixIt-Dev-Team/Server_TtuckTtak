@@ -1,7 +1,7 @@
 package com.service.ttucktak.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.service.ttucktak.entity.UserEntity;
+import com.service.ttucktak.entity.Users;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PostSigninReqDto {
+public class PostSignUpReqDto {
 
     private String userID;
 
@@ -28,8 +28,8 @@ public class PostSigninReqDto {
 
     private int accountType;
 
-    public UserEntity toEntity(boolean validation){
-        return UserEntity.builder()
+    public Users toEntity(boolean validation){
+        return Users.builder()
                 .userID(userID)
                 .userPW(userPW)
                 .userName(userName)

@@ -33,7 +33,7 @@ public class OAuthService {
     /**
      * 카카오 토큰받기
      * */
-    public String getKakaoAccessToken(String authCode){
+    public String getKakaoAccessToken(String authCode) throws BaseException {
         String accessToken = "";
 
         try{
@@ -58,6 +58,7 @@ public class OAuthService {
             int resCode = conn.getResponseCode();
             log.info("Kakao Token Code : " + resCode);
 
+            //요청 받기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             StringBuilder result = new StringBuilder();
@@ -69,12 +70,14 @@ public class OAuthService {
 
             JsonObject object = (JsonObject) JsonParser.parseString(result.toString());
 
+            //카카오 access token
             accessToken = object.get("access_token").getAsString();
 
             br.close();
             bw.close();
         }catch (Exception exception){
             log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.KAKAO_OAUTH_ERROR);
         }
 
         return accessToken;
@@ -109,14 +112,17 @@ public class OAuthService {
 
             log.info("Res Packet at kakao user info : " + result.toString());
 
+            //카카오 유저 정보 파싱 - Start
             JsonObject object = (JsonObject) JsonParser.parseString(result.toString());
 
+            //이메일 있는지 여부
             boolean hasEmail = object.get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             String email;
             if(hasEmail)
                 email = object.get("kakao_account").getAsJsonObject().get("email").getAsString();
             else throw new BaseException(BaseErrorCode.KAKAO_EMAIL_NOT_EXIST);
 
+            //생일 -> 카카오 로그인 비즈앱 인증 받아야 재대로 받아올 수 있음
             String birthday = object.get("kakao_account").getAsJsonObject().get("birthday").getAsString();
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -133,6 +139,7 @@ public class OAuthService {
             log.info(res.toString());
 
             return res;
+            //카카오 유저 정보 파싱 - end
 
         }catch (BaseException exception){
             throw exception;

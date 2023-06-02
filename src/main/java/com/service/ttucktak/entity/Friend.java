@@ -2,7 +2,6 @@ package com.service.ttucktak.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
@@ -13,29 +12,23 @@ import java.util.UUID;
 
 @DynamicInsert
 @DynamicUpdate
+@Entity(name = "Friend")
+@Table(name = "Friend")
 @Getter
-@Entity(name = "profile")
-@Table(name = "profile")
 @NoArgsConstructor
-public class ProfileEntity {
+public class Friend {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    private UUID profileIdx;
+    private UUID friendIdx;
 
-    @OneToOne
-    @JoinColumn(name = "userIdx")
-    private UserEntity userIdx;
+    @ManyToOne // Many (친구) One(유저) 한명의 유저는 여러명의 친구를 가질 수 있다.
+    @JoinColumn(name = "hostIdx")
+    private Users hostIdx; // 친구 소유 인덱슨
 
-    @Column(name = "iconType", nullable = false)
-    private Integer iconType;
-
-    @ColumnDefault("'프로필 설명을 입력해 주세요'")
-    @Column(name = "profileDesc", length = 500)
-    private String profileDesc = "'프로필 설명을 입력해 주세요'";
-
-    @Column(name = "nickName", length = 45, nullable = false)
-    private String nickName;
+    @ManyToOne // Many (친구) One(유저) 한명의 유저는 여러명의 유저에게 친구 대상이 될 수 있다.
+    @JoinColumn(name = "targetIdx")
+    private Users targetIdx; // 친구 대상 인덱스
 
     @Column(name = "createdAt")// 기본값 지정
     @CreationTimestamp
@@ -49,11 +42,4 @@ public class ProfileEntity {
 
     @Column(name = "status")
     private Boolean status = true; // Row 유효 상태
-
-    @Builder
-    public ProfileEntity(UserEntity userIdx, Integer iconType, String nickName) {
-        this.userIdx = userIdx;
-        this.iconType = iconType;
-        this.nickName = nickName;
-    }
 }

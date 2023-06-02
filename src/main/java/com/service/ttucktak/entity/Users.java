@@ -20,7 +20,7 @@ import java.util.Date;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor
-public class UserEntity {
+public class Users {
 
 
     @Id @GeneratedValue(generator = "uuid2")
@@ -66,7 +66,7 @@ public class UserEntity {
     private Boolean status = true; // Row 유효 상태
 
     @Builder
-    public UserEntity(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType, Role role) {
+    public Users(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType, Role role) {
         this.userID = userID;
         this.userPW = userPW;
         this.userName = userName;
@@ -77,7 +77,7 @@ public class UserEntity {
         this.role = role;
     }
 
-    public UserEntity update(String userName, String userEmail, String birthday) throws ParseException {
+    public Users update(String userName, String userEmail, String birthday) throws ParseException {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date date = format.parse(birthday);

@@ -3,33 +3,33 @@ package com.service.ttucktak.controller;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
-import com.service.ttucktak.dto.auth.KakaoUserDto;
-import com.service.ttucktak.dto.auth.PostSigninReqDto;
-import com.service.ttucktak.dto.auth.PostSigninResDto;
+import com.service.ttucktak.config.security.CustomHttpHeaders;
+import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
-import com.service.ttucktak.utils.JwtUtility;
-import com.service.ttucktak.utils.RegexUtility;
+import com.service.ttucktak.utils.JwtUtil;
+import com.service.ttucktak.utils.RegexUtil;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auths")
 @Slf4j
 public class AuthController {
-    private final JwtUtility jwtUtility;
+    private final JwtUtil jwtUtil;
 
     private final AuthService authService;
 
     private final OAuthService oAuthService;
 
     @Autowired
-    public AuthController(JwtUtility jwtUtility, AuthService authService, OAuthService oAuthService){
-        this.jwtUtility = jwtUtility;
+    public AuthController(JwtUtil jwtUtil, AuthService authService, OAuthService oAuthService){
+        this.jwtUtil = jwtUtil;
         this.authService = authService;
         this.oAuthService = oAuthService;
 
@@ -37,20 +37,20 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public BaseResponse<PostSigninResDto> createUsers(@RequestBody PostSigninReqDto postSigninReqDto){
+    public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
         try{
             //이메일 validation
-            if(!RegexUtility.isValidEmail(postSigninReqDto.getEmail())) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
+            if(!RegexUtil.isValidEmail(postSignUpReqDto.getEmail())) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
             //비밀번호 길이 validation
-            if(postSigninReqDto.getUserPW().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
-            if(postSigninReqDto.getUserPW().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
+            if(postSignUpReqDto.getUserPW().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
+            if(postSignUpReqDto.getUserPW().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
             //아이디 길이 validation
-            if(postSigninReqDto.getUserID().length() <2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
-            if(postSigninReqDto.getUserID().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
+            if(postSignUpReqDto.getUserID().length() <2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
+            if(postSignUpReqDto.getUserID().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
             //생일 형식 validation
-            if(!RegexUtility.isValidDateFormat(postSigninReqDto.getBirthday())) throw new BaseException(BaseErrorCode.INVALID_BIRTHDAY);
-            System.out.println(postSigninReqDto.getUserID());
-            PostSigninResDto response = authService.createUsers(postSigninReqDto);
+            if(!RegexUtil.isValidDateFormat(postSignUpReqDto.getBirthday())) throw new BaseException(BaseErrorCode.INVALID_BIRTHDAY);
+            System.out.println(postSignUpReqDto.getUserID());
+            PostSignUpResDto response = authService.createUsers(postSignUpReqDto);
 
             return new BaseResponse<>(response);
 
@@ -61,6 +61,17 @@ public class AuthController {
         }
     }
 
+    public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req){
+        try{
+            TokensDto tokensDto = authService.loginToken(req.getUserId(), req.getUserPw());
+
+            UUID userIdx = authService.loginUserIdx(req.getUserId());
+
+            return new BaseResponse<>(new PostLoginRes(userIdx.toString(), tokensDto));
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception);
+        }
+    }
     @GetMapping("/oauth2/kakao")
     public String kakaoCallback(@RequestParam String code, @RequestParam String state) {
 
@@ -69,20 +80,19 @@ public class AuthController {
     }
 
     /**
-     * 카카오 회원가입 및 로그인처리
+     * 카카오 회원정보 조회 및 로그인처리
      * */
-    @PostMapping("/oauth2/kakao/data")
-    public KakaoUserDto kakaoOauth2(@RequestHeader("AuthorizationCode") String authCode){
-        log.info("in");
-
-        String authToken = oAuthService.getKakaoAccessToken(authCode);
-        KakaoUserDto kakaoUserDto = null;
-        try{
-            kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
-        }catch (BaseException exception){
-            log.error(exception.getMessage());
-        }
-        
-        return kakaoUserDto;
-    }
+//    @PostMapping("/oauth2/kakao/data")
+//    public KakaoUserDto kakaoOauth2(@RequestHeader(CustomHttpHeaders.KAKAO_AUTH) String authCode){
+//
+//        try{
+//            String authToken = oAuthService.getKakaoAccessToken(authCode);
+//
+//            KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
+//
+//            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
+//        }catch (BaseException exception){
+//            log.error(exception.getMessage());
+//        }
+//    }
 }
