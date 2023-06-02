@@ -2,14 +2,14 @@ package com.service.ttucktak.config;
 
 import com.service.ttucktak.dto.auth.OAuthAttribute;
 import com.service.ttucktak.dto.auth.SessionUser;
-import com.service.ttucktak.entity.UserEntity;
+import com.service.ttucktak.entity.Users;
 import com.service.ttucktak.repository.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -27,6 +27,7 @@ import java.text.ParseException;
  * */
 @RequiredArgsConstructor
 @Service
+@Lazy
 public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserRepository userRepository;
@@ -45,19 +46,18 @@ public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserReque
 
         OAuthAttribute attribute = OAuthAttribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        UserEntity user = saveOrUpdate(attribute);
+        Users users = saveOrUpdate(attribute);
 
-        logger.info("in");
-        httpSession.setAttribute("user", new SessionUser(user));
+        httpSession.setAttribute("user", new SessionUser(users));
 
         return oAuth2User;
     }
 
-    private UserEntity saveOrUpdate(OAuthAttribute attribute){
-        UserEntity user = null;
+    private Users saveOrUpdate(OAuthAttribute attribute){
+        Users users = null;
         
         try{
-            user = userRepository.findByEmail(attribute.getUserEmail())
+            users = userRepository.findByEmail(attribute.getUserEmail())
                     .map(entity -> {
                         try {
                             return entity.update(attribute.getUserName(), attribute.getUserEmail(), attribute.getBirthday());
@@ -70,6 +70,6 @@ public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserReque
             logger.error("Error in CustomOAuthUserService : " + exception.getMessage());
         }
         
-        return user;
+        return users;
     }
 }

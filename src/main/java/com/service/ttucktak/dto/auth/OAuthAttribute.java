@@ -1,7 +1,7 @@
 package com.service.ttucktak.dto.auth;
 
 import com.service.ttucktak.base.Role;
-import com.service.ttucktak.entity.UserEntity;
+import com.service.ttucktak.entity.Users;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -49,7 +49,7 @@ public class OAuthAttribute {
                 .build();
     }
 
-    public UserEntity toEntity() throws ParseException {
+    public Users toEntity() throws ParseException {
         String year = "1998";
         String month = birthday.substring(0, 2);
         String day = birthday.substring(2);
@@ -58,7 +58,7 @@ public class OAuthAttribute {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date date = format.parse(birthday);
 
-        return UserEntity.builder()
+        return Users.builder()
                 .userID(userEmail)
                 .userPW("kakao")
                 .userName(userName)

@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import org.springframework.context.annotation.Lazy;
 
 
 import java.util.Date;
@@ -12,11 +13,11 @@ import java.util.UUID;
 
 @DynamicInsert
 @DynamicUpdate
-@Entity(name = "Friend")
-@Table(name = "Friend")
+@Entity(name = "friend")
+@Table(name = "friend")
 @Getter
 @NoArgsConstructor
-public class FriendEntity {
+public class Friend {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -24,11 +25,11 @@ public class FriendEntity {
 
     @ManyToOne // Many (친구) One(유저) 한명의 유저는 여러명의 친구를 가질 수 있다.
     @JoinColumn(name = "hostIdx")
-    private UserEntity hostIdx; // 친구 소유 인덱슨
+    private Users hostIdx; // 친구 소유 인덱슨
 
     @ManyToOne // Many (친구) One(유저) 한명의 유저는 여러명의 유저에게 친구 대상이 될 수 있다.
     @JoinColumn(name = "targetIdx")
-    private UserEntity targetIdx; // 친구 대상 인덱스
+    private Users targetIdx; // 친구 대상 인덱스
 
     @Column(name = "createdAt")// 기본값 지정
     @CreationTimestamp

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
-public class PostSigninResDto {
+public class PostSignUpResDto {
     @JsonProperty("isSuccess")
     boolean isSuccess;
 }

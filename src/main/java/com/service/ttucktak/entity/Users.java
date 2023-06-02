@@ -7,10 +7,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.Date;
 
@@ -18,9 +22,8 @@ import java.util.Date;
 @DynamicUpdate
 @Entity(name = "users")
 @Table(name = "users")
-@Getter
 @NoArgsConstructor
-public class UserEntity {
+public class Users implements UserDetails {
 
 
     @Id @GeneratedValue(generator = "uuid2")
@@ -48,10 +51,6 @@ public class UserEntity {
     @Column(name = "accountType", nullable = false)
     private Integer accountType; // 계정 타입
 
-    @Column(name = "role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
     @Column(name = "createdAt")// 기본값 지정
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,8 +64,52 @@ public class UserEntity {
     @Column(name = "status")
     private Boolean status = true; // Row 유효 상태
 
+    public UUID getUserIdx() {
+        return userIdx;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUserPW() {
+        return userPW;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public Boolean getValidation() {
+        return validation;
+    }
+
+    public Integer getAccountType() {
+        return accountType;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
     @Builder
-    public UserEntity(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType, Role role) {
+    public Users(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType, Role role) {
         this.userID = userID;
         this.userPW = userPW;
         this.userName = userName;
@@ -74,19 +117,52 @@ public class UserEntity {
         this.birthday = birthday;
         this.validation = validation;
         this.accountType = accountType;
-        this.role = role;
     }
 
-    public UserEntity update(String userName, String userEmail, String birthday) throws ParseException {
+    public Users update(String userName, String userEmail, String birthday) throws ParseException {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date date = format.parse(birthday);
-
         this.userID = userEmail;
         this.email = userEmail;
         this.userName = userName;
         this.birthday = date;
 
         return this;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return userPW;
+    }
+
+    @Override
+    public String getUsername() {
+        return userID;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

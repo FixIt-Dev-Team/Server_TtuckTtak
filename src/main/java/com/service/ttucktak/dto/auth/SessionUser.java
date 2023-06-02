@@ -1,6 +1,6 @@
 package com.service.ttucktak.dto.auth;
 
-import com.service.ttucktak.entity.UserEntity;
+import com.service.ttucktak.entity.Users;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -12,9 +12,9 @@ public class SessionUser implements Serializable {
     private final String userEmail;
     private final Date birthday;
 
-    public SessionUser(UserEntity user) {
-        this.userName = user.getUserName();
-        this.userEmail = user.getEmail();
-        this.birthday = user.getBirthday();
+    public SessionUser(Users users) {
+        this.userName = users.getUserName();
+        this.userEmail = users.getEmail();
+        this.birthday = users.getBirthday();
     }
 }
