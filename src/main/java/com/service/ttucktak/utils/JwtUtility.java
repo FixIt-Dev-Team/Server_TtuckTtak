@@ -92,12 +92,12 @@ public class JwtUtility {
      * @return : jwtToken(String)
      * */
     public String getAccessToken(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest request = (HttpServletRequest) (RequestContextHolder.currentRequestAttributes());
         return request.getHeader("SERVER-ACCESS-TOKEN");
     }
 
     public String getRefreshToken(){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest request = (HttpServletRequest) (RequestContextHolder.currentRequestAttributes());
         return request.getHeader("SERVER-REFRESH-TOKEN");
     }
 

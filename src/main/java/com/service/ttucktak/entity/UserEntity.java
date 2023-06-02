@@ -1,18 +1,19 @@
 package com.service.ttucktak.entity;
 
+import com.service.ttucktak.base.Role;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 import java.util.Date;
 
-@ApiIgnore
 @DynamicInsert
 @DynamicUpdate
 @Entity(name = "users")
@@ -20,6 +21,8 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 public class UserEntity {
+
+
     @Id @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID userIdx;
@@ -45,6 +48,10 @@ public class UserEntity {
     @Column(name = "accountType", nullable = false)
     private Integer accountType; // 계정 타입
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Column(name = "createdAt")// 기본값 지정
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -59,7 +66,7 @@ public class UserEntity {
     private Boolean status = true; // Row 유효 상태
 
     @Builder
-    public UserEntity(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType) {
+    public UserEntity(String userID, String userPW, String userName, String email, Date birthday, Boolean validation, Integer accountType, Role role) {
         this.userID = userID;
         this.userPW = userPW;
         this.userName = userName;
@@ -67,5 +74,19 @@ public class UserEntity {
         this.birthday = birthday;
         this.validation = validation;
         this.accountType = accountType;
+        this.role = role;
+    }
+
+    public UserEntity update(String userName, String userEmail, String birthday) throws ParseException {
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = format.parse(birthday);
+
+        this.userID = userEmail;
+        this.email = userEmail;
+        this.userName = userName;
+        this.birthday = date;
+
+        return this;
     }
 }
