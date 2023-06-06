@@ -63,9 +63,7 @@ public class AuthController {
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req){
         try{
-            log.debug("1");
             TokensDto tokensDto = authService.loginToken(req.getUserId(), req.getUserPw());
-            log.debug("2");
             UUID userIdx = authService.loginUserIdx(req.getUserId());
 
             return new BaseResponse<>(new PostLoginRes(userIdx.toString(), tokensDto));
@@ -83,17 +81,19 @@ public class AuthController {
     /**
      * 카카오 회원정보 조회 및 로그인처리
      * */
-//    @PostMapping("/oauth2/kakao/data")
-//    public KakaoUserDto kakaoOauth2(@RequestHeader(CustomHttpHeaders.KAKAO_AUTH) String authCode){
-//
-//        try{
-//            String authToken = oAuthService.getKakaoAccessToken(authCode);
-//
-//            KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
-//
-//            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
-//        }catch (BaseException exception){
-//            log.error(exception.getMessage());
-//        }
-//    }
+    @PostMapping("/oauth2/login/kakao")
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestHeader(CustomHttpHeaders.KAKAO_AUTH) String authCode){
+
+        try{
+            String authToken = oAuthService.getKakaoAccessToken(authCode);
+
+            KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
+
+            return new BaseResponse<>(authService.kakaoOauth2(kakaoUserDto));
+            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
+        }catch (BaseException exception){
+            log.error(exception.getMessage());
+            return new BaseResponse<>(exception);
+        }
+    }
 }

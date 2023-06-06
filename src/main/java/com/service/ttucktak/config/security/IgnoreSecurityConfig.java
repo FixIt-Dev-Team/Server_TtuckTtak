@@ -26,6 +26,8 @@ public class IgnoreSecurityConfig {
                 .authorizeHttpRequests() //Http Request를 인가하라
                 .requestMatchers("/api/auths/signup").permitAll()
                 .requestMatchers("/api/auths/login").permitAll()
+                .requestMatchers("/api/oauth2/kakao").permitAll()
+                .requestMatchers("/api/oauth2/login/kakao").permitAll()
                 .and()
                 .csrf().disable();
         return http.build();
