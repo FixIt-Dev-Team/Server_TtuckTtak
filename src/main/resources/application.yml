@@ -32,3 +32,26 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+#스웨거 springdoc 세팅
+springdoc:
+  swagger-ui:
+    enabled: true
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: method
+    groups-order: desc
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  packages-to-scan: com.service.ttucktak.controller
+  show-actuator: true
+  paths-to-match:
+    - /api/**
+
+#시스템에서 자동으로 찍어주는 로그 (기반 시스템 만질때 trace로 설정하고 사용)
+logging:
+  level:
+    web: off
