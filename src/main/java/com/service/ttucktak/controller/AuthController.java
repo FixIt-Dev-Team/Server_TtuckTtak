@@ -10,8 +10,15 @@ import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.utils.RegexUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -19,7 +26,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auths")
+@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "요청에 성공하였습니다.")})
 @Slf4j
+@Tag(name = "회원 인증 API")
 public class AuthController {
     private final JwtUtil jwtUtil;
 
@@ -35,7 +44,31 @@ public class AuthController {
 
     }
 
+    @GetMapping("/exception")
+    public BaseResponse<BaseException> accessExceptionHandler(){
+        return new BaseResponse<>(new BaseException(BaseErrorCode.AUTH_FAILED));
+    }
 
+
+    @Operation(summary = "회원가입", description = "유저 회원 가입을 위한 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 너무 짧습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 너무 깁니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저 아이디가 너무 짧습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저 아이디가 너무 깁니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "생일 형식에 맞지 않습니다 yyyy-MM-dd",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "유저가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PostMapping("/signup")
     public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
         try{

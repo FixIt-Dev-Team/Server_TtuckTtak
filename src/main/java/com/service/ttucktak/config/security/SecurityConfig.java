@@ -15,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * JWT 필요한 api 필터 체인
+ * @author  LEE JIHO
+ * */
 @EnableWebSecurity(debug = true)
 @Configuration
 public class SecurityConfig {
@@ -28,7 +32,7 @@ public class SecurityConfig {
         this.jwtUtil = jwtUtil;
     }
 
-    @Order(1)
+    @Order(10)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception{
 
@@ -49,6 +53,12 @@ public class SecurityConfig {
                 .oauth2Login() //OAuth Login은 다음과 같다
                 .userInfoEndpoint()
                 .userService(customOAuthUserService);
+
+        //exception Handling
+        http.exceptionHandling()
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendRedirect("/api/auths/exception");
+                });
 
         return http.build();
     }

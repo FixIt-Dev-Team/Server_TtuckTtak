@@ -22,8 +22,10 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 
 /**
- * OAuth User 정보 서비스
- * 받아온 유저 정보를
+ * OAuth User 정보 서비스 &
+ * 실제 서비스시 삭제
+ * @author LEE JIHO
+ * @needToDelete true
  * */
 @RequiredArgsConstructor
 @Service

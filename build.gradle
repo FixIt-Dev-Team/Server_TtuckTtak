@@ -2,11 +2,16 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.7'
     id 'io.spring.dependency-management' version '1.1.0'
+    id "org.asciidoctor.convert" version "1.5.9.2"
+}
+
+asciidoctor {
+    dependsOn test
 }
 
 group = 'com.service'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '19'
+sourceCompatibility = '17'
 
 configurations {
     compileOnly {
@@ -23,7 +28,6 @@ dependencies {
     //Starter
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
@@ -41,6 +45,7 @@ dependencies {
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
 
     //Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -49,9 +54,11 @@ dependencies {
 
     //Swagger
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.1.0'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 
     //HTTP
-    implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.9.0'
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: '2.9.0'
     implementation group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.9.0'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.2'
@@ -63,15 +70,6 @@ dependencies {
 
     //Json
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
-    //logger
-    implementation 'org.slf4j:slf4j-api:1.7.31'
-    implementation 'ch.qos.logback:logback-core:1.2.3'
-
-    implementation ('ch.qos.logback:logback-classic:1.2.3'){
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-        exclude group: 'ch.qos.logback', module: 'logback-core'
-    }
 }
 
 tasks.named('test') {

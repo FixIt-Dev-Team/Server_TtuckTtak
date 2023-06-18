@@ -15,10 +15,10 @@ public enum BaseErrorCode {
      *
      */
     INVALID_JWT_TOKEN(HttpStatus.BAD_REQUEST.value(), "권한이 없는 토큰입니다."),
-
+    AUTH_FAILED(HttpStatus.BAD_REQUEST.value(), "권한 인증에 실패하였습니다, 토큰을 갱신해주세요"),
     PW_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "비밀번호가 너무 짧습니다."),
     PW_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "비밀번호가 너무 깁니다."),
-    ID_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 짧습니다"),
+    ID_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 짧습니다."),
     ID_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 깁니다."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
@@ -33,7 +33,8 @@ public enum BaseErrorCode {
      * 500 INTERNAL SERVER ERROR
      * */
     KAKAO_OAUTH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 로그인 중 오류발생 서버에 문의"),
-    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Database Error");
+    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Database Error"),
+    UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생하였습니다.");
     /**
      *
      * */
