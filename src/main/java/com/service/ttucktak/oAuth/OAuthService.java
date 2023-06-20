@@ -1,9 +1,11 @@
 package com.service.ttucktak.oAuth;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+import com.service.ttucktak.dto.auth.GoogleUserDto;
 import com.service.ttucktak.dto.auth.KakaoUserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,6 +148,36 @@ public class OAuthService {
         } catch (Exception exception){
             log.error("Exception in getKakaoUserInfo : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.KAKAO_OAUTH_ERROR);
+        }
+    }
+
+    public GoogleUserDto getGoogleUserInfo(GoogleIdToken idToken) throws BaseException{
+        try{
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            // Print user identifier
+            String userId = payload.getSubject();
+            System.out.println("User ID: " + userId);
+
+            // Get profile information from payload
+            String email = payload.getEmail();
+            boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+            String name = (String) payload.get("name");
+            String pictureUrl = (String) payload.get("picture");
+
+            log.info("user info | name :" + name + " | email : " + email + " | imgURL : " + pictureUrl);
+
+            GoogleUserDto res = GoogleUserDto.builder().userName(name).userEmail(email).imgURL(pictureUrl).birthday(new Date()).build();
+
+            log.info(res.toString());
+
+            return res;
+            //구글 유저 정보 파싱 - end
+
+        } catch (Exception exception){
+            log.error("Exception in getGoogleUserInfo : " + exception.getMessage());
+            throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_ERROR);
         }
     }
 }
