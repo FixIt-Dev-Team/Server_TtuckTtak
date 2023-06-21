@@ -9,6 +9,7 @@ import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
 import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.utils.RegexUtil;
+import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import io.swagger.v3.oas.annotations.Operation;
