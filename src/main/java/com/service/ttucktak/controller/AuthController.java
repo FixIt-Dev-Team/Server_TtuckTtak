@@ -3,7 +3,6 @@ package com.service.ttucktak.controller;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
-import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
@@ -73,6 +72,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
+
     @PostMapping("/signup")
     public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
         try{
@@ -97,6 +97,9 @@ public class AuthController {
         }
     }
 
+    /**
+     * 로그인 처리 API
+     * */
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req){
         try{
@@ -108,18 +111,12 @@ public class AuthController {
             return new BaseResponse<>(exception);
         }
     }
-    @GetMapping("/oauth2/kakao")
-    public String kakaoCallback(@RequestParam String code, @RequestParam String state) {
-
-        log.info(code);
-        return code;
-    }
 
     /**
      * 카카오 회원정보 조회 및 로그인처리
      * */
-    @PostMapping("/oauth2/login/kakao")
-    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestHeader(CustomHttpHeaders.KAKAO_AUTH) String authCode){
+    @GetMapping("/oauth2/kakao")
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam String authCode, @RequestParam String state){
 
         try{
             String authToken = oAuthService.getKakaoAccessToken(authCode);
