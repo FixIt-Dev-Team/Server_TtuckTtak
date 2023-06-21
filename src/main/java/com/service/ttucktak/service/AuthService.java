@@ -137,4 +137,53 @@ public class AuthService {
             throw new BaseException(BaseErrorCode.LOGIN_FAILED);
         }
     }
+
+    public PostLoginRes googleOauth2(GoogleUserDto googleUserDto) throws BaseException {
+        boolean userExist = userRepository.existsUsersByUserID(googleUserDto.getUserEmail());
+
+        //유저 미 존재시 회원가입 후 로그인 처리
+        if(!userExist) {
+            try{
+                PostSignUpReqDto postSignUpReqDto =
+                        new PostSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
+                                googleUserDto.getUserName(), googleUserDto.getUserEmail(),
+                                googleUserDto.getBirthday(), 1);
+
+                Users entity = postSignUpReqDto.toEntity(false);
+
+                UUID userIdx = userRepository.save(entity).getUserIdx();
+                Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
+                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
+                Profile profile =
+                        Profile.builder()
+                                .usersIdx(insertedEntity.get())
+                                .iconType(0)
+                                .nickName(insertedEntity.get().getUserName())
+                                .build();
+
+                profileRepository.save(profile);
+
+            }catch (Exception exception){
+                log.error(exception.getMessage());
+                throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+            }
+        }
+
+        //로그인 처리
+        try{
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
+
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+            TokensDto token = jwtUtil.createTokens(authentication);
+
+            UUID userIdx = loginUserIdx(googleUserDto.getUserEmail());
+
+            return new PostLoginRes(userIdx.toString(), token);
+        }
+        catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
+        }
+    }
 }

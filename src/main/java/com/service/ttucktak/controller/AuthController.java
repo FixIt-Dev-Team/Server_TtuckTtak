@@ -7,8 +7,10 @@ import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
+import com.service.ttucktak.utils.GoogleJwtUtil;
 import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.utils.RegexUtil;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -32,13 +33,16 @@ import java.util.UUID;
 public class AuthController {
     private final JwtUtil jwtUtil;
 
+    private final GoogleJwtUtil googleJwtUtil;
+
     private final AuthService authService;
 
     private final OAuthService oAuthService;
 
     @Autowired
-    public AuthController(JwtUtil jwtUtil, AuthService authService, OAuthService oAuthService){
+    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService){
         this.jwtUtil = jwtUtil;
+        this.googleJwtUtil = googleJwtUtil;
         this.authService = authService;
         this.oAuthService = oAuthService;
 
@@ -123,6 +127,34 @@ public class AuthController {
             KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
 
             return new BaseResponse<>(authService.kakaoOauth2(kakaoUserDto));
+            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
+        }catch (BaseException exception){
+            log.error(exception.getMessage());
+            return new BaseResponse<>(exception);
+        }
+    }
+
+    /**
+     * 구글 회원정보 조회 및 로그인 처리
+     * */
+
+    @PostMapping("/oauth2/login/google")
+    public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString){
+
+        try{
+            GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
+
+            GoogleUserDto googleUserDto = null;
+
+            if (idToken != null) {
+
+                googleUserDto = oAuthService.getGoogleUserInfo(idToken);
+
+            } else {
+                throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_EXPIRE);
+            }
+
+            return new BaseResponse<>(authService.googleOauth2(googleUserDto));
             //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
         }catch (BaseException exception){
             log.error(exception.getMessage());

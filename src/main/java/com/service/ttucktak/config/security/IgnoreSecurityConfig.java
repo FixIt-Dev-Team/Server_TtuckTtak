@@ -35,6 +35,8 @@ public class IgnoreSecurityConfig {
                 .requestMatchers("/api/auths/login").permitAll()
                 .requestMatchers("/api/auths/oauth2/kakao").permitAll()
                 .requestMatchers("/api/auths/oauth2/login/kakao").permitAll()
+                .requestMatchers("/api/auths/oauth2/google").permitAll()
+                .requestMatchers("/api/auths/oauth2/login/google").permitAll()
                 .requestMatchers("/oauth2/authorization/kakao").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger-ui/index.html").permitAll()

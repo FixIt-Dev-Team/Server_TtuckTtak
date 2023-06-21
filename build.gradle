@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
@@ -70,6 +71,9 @@ dependencies {
 
     //Json
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    //GoogleAPI
+    implementation 'com.google.api-client:google-api-client:1.33.0'
 }
 
 tasks.named('test') {
