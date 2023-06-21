@@ -42,7 +42,9 @@ public enum BaseErrorCode {
     KAKAO_OAUTH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 로그인 중 오류발생 서버에 문의"),
     GOOGLE_OAUTH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 로그인 중 오류발생 서버에 문의"),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Database Error"),
-    UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생하였습니다.");
+    UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생하였습니다."),
+    GOOGLE_GENERALSECURITY_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 구글 시큐리티 문제가 발생하였습니다."),
+    GOOGLE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 IO 문제가 발생하였습니다.");
     /**
      *
      * */

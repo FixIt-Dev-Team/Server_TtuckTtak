@@ -8,7 +8,6 @@ import java.util.Date;
 
 
 @Getter
-@Builder
 @ToString
 public class GoogleUserDto {
     private final String userName;
@@ -16,4 +15,14 @@ public class GoogleUserDto {
     private final String imgURL;
     private Date birthday;
     private static int accountType;
+
+    @Builder
+    public GoogleUserDto (String userName,String userEmail,String imgURL, Date birthday){
+
+        this.userName = userName;
+        this.userEmail = userEmail;
+        this.imgURL = imgURL;
+        this.birthday = birthday;
+
+    }
 }
