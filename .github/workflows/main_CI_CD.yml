@@ -27,7 +27,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: arn:aws:iam::161761242539:role/Ttuckttak_CI_CD
+          role-to-assume: arn:aws:iam::161761242539:oidc-provider/token.actions.githubusercontent.com
           role-session-name: samplerolesession
           aws-region: ${{ secrets.AWS_REGION }} 
     
