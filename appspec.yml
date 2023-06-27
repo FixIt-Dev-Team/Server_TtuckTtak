@@ -14,5 +14,5 @@ permissions:
     
 hooks:
   ApplicationStart:
-  - location: ./deploy.sh
+  - location: /home/ubuntu/github_action/deploy.sh
     runas: ubuntu
