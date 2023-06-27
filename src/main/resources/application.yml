@@ -9,9 +9,9 @@ spring:
   application:
     name: TtuckTakServer
   datasource:
-    url: jdbc:mysql://database-1.cekg2t7qwqmr.ap-northeast-2.rds.amazonaws.com:3306/TtukTtak
+    url: jdbc:mysql://ttukttak-db.c7p6u96njzwf.ap-northeast-2.rds.amazonaws.com:3306/TtukTtak
     username: admin
-    password: q3143118
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
