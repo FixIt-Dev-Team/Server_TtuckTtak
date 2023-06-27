@@ -13,6 +13,6 @@ permissions:
     mode: 755
     
 hooks:
-  ApplicationStart:
+  ValidateService:
   - location: scripts/deploy.sh
     runas: ubuntu
