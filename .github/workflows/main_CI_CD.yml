@@ -15,7 +15,7 @@ on:
 
 env:
   S3_BUCKET_NAME: ttuckttak
-  RESOURCE_PATH: ./src/main/resources/secret.yaml
+  RESOURCE_PATH: ./src/main/resources/secret.yml
   CODE_DEPLOY_APPLICATION_NAME: ttuckttak-code-deploy-dev
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ttuckttak-dev-1
 
