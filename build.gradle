@@ -76,6 +76,10 @@ dependencies {
     implementation 'com.google.api-client:google-api-client:1.33.0'
 }
 
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
