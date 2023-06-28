@@ -1,9 +1,6 @@
 name: test-CI-CD
 
 on:
-  push:
-    branches:
-      - develop
   workflow_dispatch:
     inputs:
          logLevel:
