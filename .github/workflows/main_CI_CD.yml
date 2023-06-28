@@ -41,10 +41,7 @@ jobs:
           java-version: 17
         
       - name: Set Secret yml file.
-      - uses: actions/checkout@v3
-      - run: touch ./src/main/resources/secret.yml
-      - run: echo "${{ secrets.SECRETYML }}" > ./src/main/resources/secret.yml
-      - run: cat ./src/main/resources/secret.yml
+        run: touch ./src/main/resources/secret.yml && echo "${{ secrets.SECRETYML }}" > ./src/main/resources/secret.yml && cat ./src/main/resources/secret.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
