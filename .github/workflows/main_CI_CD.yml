@@ -42,15 +42,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-          
-      - name: Set yaml file 
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.RESOURCE_PATH }} 
-        env:
-          spring.security.oauth2.client.registration.kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
-          jwt.secret-key: ${{ secrets.JWT_SECRET_KEY }}
-          jwt.client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+        
+      - name: Set Secret yml file.
+      - uses: actions/checkout@v3
+      - run: touch ./src/main/resources/secret.yml
+      - run: echo "${{ secrets.SECRETYML }}" > ./src/main/resources/secret.yml
+      - run: cat ./src/main/resources/secret.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
