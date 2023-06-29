@@ -73,7 +73,6 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-
     @PostMapping("/signup")
     public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
         try{
@@ -117,7 +116,7 @@ public class AuthController {
      * 카카오 회원정보 조회 및 로그인처리
      * */
     @GetMapping("/oauth2/kakao")
-    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam String authCode, @RequestParam String state){
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam String authCode){
 
         try{
             String authToken = oAuthService.getKakaoAccessToken(authCode);
