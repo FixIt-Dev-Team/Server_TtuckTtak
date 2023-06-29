@@ -2,13 +2,13 @@ package com.service.ttucktak.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
-public class TokensDto {
-    private String grantType;
-    private String accessToken;
-    private String refreshToken;
+@NoArgsConstructor
+public class PostLoginRes {
+    private String userIdx;
+    private TokensDto tokenInfo;
 }

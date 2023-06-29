@@ -1,25 +1,24 @@
 package com.service.ttucktak.entity;
 
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-import springfox.documentation.annotations.ApiIgnore;
+import org.springframework.context.annotation.Lazy;
 
-import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
 import java.util.Date;
 import java.util.UUID;
 
-@ApiIgnore
 @DynamicInsert
 @DynamicUpdate
 @Getter
 @Entity(name = "profile")
 @Table(name = "profile")
 @NoArgsConstructor
-public class ProfileEntity {
+public class Profile {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -27,7 +26,7 @@ public class ProfileEntity {
 
     @OneToOne
     @JoinColumn(name = "userIdx")
-    private UserEntity userIdx;
+    private Users usersIdx;
 
     @Column(name = "iconType", nullable = false)
     private Integer iconType;
@@ -53,8 +52,8 @@ public class ProfileEntity {
     private Boolean status = true; // Row 유효 상태
 
     @Builder
-    public ProfileEntity(UserEntity userIdx, Integer iconType, String nickName) {
-        this.userIdx = userIdx;
+    public Profile(Users usersIdx, Integer iconType, String nickName) {
+        this.usersIdx = usersIdx;
         this.iconType = iconType;
         this.nickName = nickName;
     }
