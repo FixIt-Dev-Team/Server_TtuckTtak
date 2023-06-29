@@ -23,3 +23,4 @@ docker build --tag ${db_image_name}:${version}
 
 # Run container
 echo "=> Run container..."
+docker run -d -p ${port}:${port} --name ${db_container_name} ${db_image_name}:${version}
