@@ -149,7 +149,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @PostMapping("/oauth2/login/google")
+    @PostMapping("/oauth2/google")
     public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString){
 
         try{
