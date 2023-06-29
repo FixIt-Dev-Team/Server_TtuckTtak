@@ -15,7 +15,7 @@ docker rm -f ${db_container_name}
 
 # remove image
 echo "=> Remove previous image..."
-docker rmi -f ${db_image_name}:${version}
+docker rmi -f ${db_image_name}:${version} .
 
 # new-build/re-build docker image
 echo "=> Build new image..."
@@ -23,4 +23,3 @@ docker build --tag ${db_image_name}:${version}
 
 # Run container
 echo "=> Run container..."
-docker run -d -p ${port}:${port} --name ${db_container_name} ${db_image_name}:${version}
