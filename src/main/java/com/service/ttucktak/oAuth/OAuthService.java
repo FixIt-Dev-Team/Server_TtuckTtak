@@ -29,8 +29,7 @@ public class OAuthService {
     private String infoReqUrl;
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoTokenKey;
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String redirectUri;
+    private String redirectUri = "https://ttukttak.store/api/auths/oauth2/kakao";
 
     /**
      * 카카오 토큰받기
