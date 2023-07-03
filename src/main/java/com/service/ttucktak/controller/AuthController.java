@@ -112,11 +112,18 @@ public class AuthController {
         }
     }
 
+//    /**
+//     * 카카오 태스트
+//     * */
+//    @GetMapping("oauth2/kakao/test")
+//    public String kakaoTest(@RequestParam("code") String code){
+//        return code;
+//    }
     /**
      * 카카오 회원정보 조회 및 로그인처리
      * */
     @GetMapping("/oauth2/kakao")
-    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam String authCode){
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode){
 
         try{
             String authToken = oAuthService.getKakaoAccessToken(authCode);
@@ -149,7 +156,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @PostMapping("/oauth2/login/google")
+    @PostMapping("/oauth2/google")
     public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString){
 
         try{
