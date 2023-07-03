@@ -44,6 +44,7 @@ public class OAuthService {
 
             //POST 요청
             conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             conn.setDoOutput(true);
 
             //요청 전송
@@ -54,11 +55,14 @@ public class OAuthService {
             sb.append("&client_id=" + kakaoTokenKey);
             sb.append("&redirect_uri=" + redirectUri);
             sb.append("&code=" + authCode);
+
             bw.write(sb.toString());
             bw.flush();
 
+            log.info(sb.toString());
             int resCode = conn.getResponseCode();
             log.info("Kakao Token Code : " + resCode);
+            log.info("msg : " + conn.getResponseMessage());
 
             //요청 받기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -77,6 +81,7 @@ public class OAuthService {
 
             br.close();
             bw.close();
+
         }catch (Exception exception){
             log.error(exception.getMessage());
             throw new BaseException(BaseErrorCode.KAKAO_OAUTH_ERROR);
