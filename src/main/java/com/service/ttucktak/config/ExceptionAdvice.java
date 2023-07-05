@@ -25,6 +25,6 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public BaseResponse<BaseErrorCode> ExceptionHandle(Exception exception) {
         log.error("Exception has occured. ", exception);
-        return new BaseResponse<>(BaseErrorCode.UNEXPECTED_ERROR);
+        return new BaseResponse<>(new BaseException(BaseErrorCode.UNEXPECTED_ERROR));
     }
 }
