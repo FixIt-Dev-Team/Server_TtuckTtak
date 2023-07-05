@@ -90,7 +90,14 @@ public class AuthService {
     }
 
     public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
-        boolean userExist = userRepository.existsUsersByUserID(kakaoUserDto.getUserEmail());
+        boolean userExist = false;
+
+        try{
+            userExist = userRepository.existsUsersByUserID(kakaoUserDto.getUserEmail());
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
 
         //유저 미 존재시 회원가입 후 로그인 처리
         if(!userExist) {
@@ -139,7 +146,14 @@ public class AuthService {
     }
 
     public PostLoginRes googleOauth2(GoogleUserDto googleUserDto) throws BaseException {
-        boolean userExist = userRepository.existsUsersByUserID(googleUserDto.getUserEmail());
+        boolean userExist = false;
+
+        try{
+            userExist = userRepository.existsUsersByUserID(googleUserDto.getUserEmail());
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
 
         //유저 미 존재시 회원가입 후 로그인 처리
         if(!userExist) {
