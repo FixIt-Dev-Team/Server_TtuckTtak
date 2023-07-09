@@ -3,6 +3,7 @@ package com.service.ttucktak.service;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.*;
+import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.entity.Profile;
 import com.service.ttucktak.entity.Users;
 import com.service.ttucktak.repository.ProfileRepository;
@@ -57,6 +58,7 @@ public class AuthService {
                             .build();
 
             profileRepository.save(profile);
+
 
         }catch (Exception exception){
             log.error(exception.getMessage());

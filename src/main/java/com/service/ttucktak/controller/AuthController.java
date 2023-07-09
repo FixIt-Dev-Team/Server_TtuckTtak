@@ -4,6 +4,7 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
+import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
