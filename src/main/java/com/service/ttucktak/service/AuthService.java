@@ -3,17 +3,14 @@ package com.service.ttucktak.service;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.*;
-import com.service.ttucktak.entity.Profile;
-import com.service.ttucktak.entity.Users;
-import com.service.ttucktak.repository.ProfileRepository;
-import com.service.ttucktak.repository.UserRepository;
+import com.service.ttucktak.entity.Member;
+import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,39 +21,32 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class AuthService {
-    private final UserRepository userRepository;
-    private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserRepository userRepository, ProfileRepository profileRepository, JwtUtil jwtUtil, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder){
-        this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
+    public AuthService(JwtUtil jwtUtil, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder, MemberRepository memberRepository){
         this.jwtUtil = jwtUtil;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.passwordEncoder = passwordEncoder;
+        this.memberRepository = memberRepository;
     }
 
+    /**
+     * 회원가입 - Service
+     * */
     @Transactional(rollbackFor = BaseException.class)
     public PostSignUpResDto createUsers(PostSignUpReqDto postSignUpReqDto) throws BaseException {
 
         try{
-            postSignUpReqDto.setUserPW(passwordEncoder.encode(postSignUpReqDto.getUserPW()));
-            Users entity = postSignUpReqDto.toEntity(false);
+            postSignUpReqDto.setUserPw(passwordEncoder.encode(postSignUpReqDto.getUserPw()));
+            Member entity = postSignUpReqDto.toEntity();
 
-            UUID userIdx = userRepository.save(entity).getUserIdx();
-            Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
+            UUID memberIdx = memberRepository.save(entity).getMemberIdx();
+            Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
             insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-            Profile profile =
-                    Profile.builder()
-                            .usersIdx(insertedEntity.get())
-                            .iconType(0)
-                            .nickName(insertedEntity.get().getUserName())
-                            .build();
-
-            profileRepository.save(profile);
 
         }catch (Exception exception){
             log.error(exception.getMessage());
@@ -66,6 +56,9 @@ public class AuthService {
         return new PostSignUpResDto(true);
     }
 
+    /**
+     * 토큰 생성
+     * */
     public TokensDto loginToken(String userID, String userPW) throws BaseException {
 
         try{
@@ -82,18 +75,21 @@ public class AuthService {
 
     }
 
+    /**
+     * 로그인한 멤버 인덱스 가져오기
+     * */
     public UUID loginUserIdx(String userID) throws BaseException {
-        Optional<UUID> userIdx = userRepository.findUserIdxByUserID(userID);
-        userIdx.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
+        Optional<UUID> memberIdx = memberRepository.findMemberIdxById(userID);
+        memberIdx.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
 
-        return userIdx.get();
+        return memberIdx.get();
     }
 
     public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
         boolean userExist = false;
 
         try{
-            userExist = userRepository.existsUsersByUserID(kakaoUserDto.getUserEmail());
+            userExist = memberRepository.existsMemberByUserId(kakaoUserDto.getUserEmail());
         }catch (Exception exception){
             log.error(exception.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -104,22 +100,13 @@ public class AuthService {
             try{
                 PostSignUpReqDto postSignUpReqDto =
                         new PostSignUpReqDto(kakaoUserDto.getUserEmail(), passwordEncoder.encode(kakaoUserDto.getUserEmail()),
-                                kakaoUserDto.getUserName(), kakaoUserDto.getUserEmail(),
-                                kakaoUserDto.getBirthday(), 1);
+                                kakaoUserDto.getUserName(), 1);
 
-                Users entity = postSignUpReqDto.toEntity(false);
+                Member entity = postSignUpReqDto.toEntity();
 
-                UUID userIdx = userRepository.save(entity).getUserIdx();
-                Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
+                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
+                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
                 insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-                Profile profile =
-                        Profile.builder()
-                                .usersIdx(insertedEntity.get())
-                                .iconType(0)
-                                .nickName(insertedEntity.get().getUserName())
-                                .build();
-
-                profileRepository.save(profile);
 
             }catch (Exception exception){
                 log.error(exception.getMessage());
@@ -149,7 +136,7 @@ public class AuthService {
         boolean userExist = false;
 
         try{
-            userExist = userRepository.existsUsersByUserID(googleUserDto.getUserEmail());
+            userExist = memberRepository.existsMemberByUserId(googleUserDto.getUserEmail());
         }catch (Exception exception){
             log.error(exception.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -160,22 +147,13 @@ public class AuthService {
             try{
                 PostSignUpReqDto postSignUpReqDto =
                         new PostSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
-                                googleUserDto.getUserName(), googleUserDto.getUserEmail(),
-                                googleUserDto.getBirthday(), 1);
+                                googleUserDto.getUserName(), 2);
 
-                Users entity = postSignUpReqDto.toEntity(false);
+                Member entity = postSignUpReqDto.toEntity();
 
-                UUID userIdx = userRepository.save(entity).getUserIdx();
-                Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
+                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
+                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
                 insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-                Profile profile =
-                        Profile.builder()
-                                .usersIdx(insertedEntity.get())
-                                .iconType(0)
-                                .nickName(insertedEntity.get().getUserName())
-                                .build();
-
-                profileRepository.save(profile);
 
             }catch (Exception exception){
                 log.error(exception.getMessage());

@@ -1,13 +1,11 @@
 package com.service.ttucktak.dto.auth;
 
-import com.service.ttucktak.base.Role;
-import com.service.ttucktak.entity.Users;
+import com.service.ttucktak.base.AccountType;
+import com.service.ttucktak.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -49,24 +47,18 @@ public class OAuthAttribute {
                 .build();
     }
 
-    public Users toEntity() throws ParseException {
-        String year = "1998";
-        String month = birthday.substring(0, 2);
-        String day = birthday.substring(2);
-        this.birthday = year + "-" + month + "-" + day;
+    public Member toEntity() throws ParseException {
+        AccountType type;
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = format.parse(birthday);
+        if(accountType == 0) type = AccountType.DEFAULT;
+        else if(accountType == 1) type = AccountType.KAKAO;
+        else type = AccountType.GOOGLE;
 
-        return Users.builder()
-                .userID(userEmail)
-                .userPW("kakao")
-                .userName(userName)
-                .email(userEmail)
-                .birthday(date)
-                .validation(false)
-                .accountType(accountType)
-                .role(Role.ROLE_USER)
+        return Member.builder()
+                .userId(userEmail)
+                .userPw("kakao")
+                .nickname(userName)
+                .accountType(type)
                 .build();
     }
 }

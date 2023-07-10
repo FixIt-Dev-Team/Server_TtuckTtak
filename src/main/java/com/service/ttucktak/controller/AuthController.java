@@ -4,6 +4,7 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
+import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
@@ -66,8 +67,6 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "400", description = "유저 아이디가 너무 깁니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "생일 형식에 맞지 않습니다 yyyy-MM-dd",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "404", description = "유저가 존재하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
@@ -77,15 +76,14 @@ public class AuthController {
     public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
         try{
             //이메일 validation
-            if(!RegexUtil.isValidEmail(postSignUpReqDto.getEmail())) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
+            if(!RegexUtil.isValidEmail(postSignUpReqDto.getUserId())) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
             //비밀번호 길이 validation
-            if(postSignUpReqDto.getUserPW().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
-            if(postSignUpReqDto.getUserPW().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
+            if(postSignUpReqDto.getUserPw().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
+            if(postSignUpReqDto.getUserPw().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
             //아이디 길이 validation
-            if(postSignUpReqDto.getUserID().length() <2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
-            if(postSignUpReqDto.getUserID().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
+            if(postSignUpReqDto.getUserId().length() <2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
+            if(postSignUpReqDto.getUserId().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
             //생일 형식 validation
-            if(!RegexUtil.isValidDateFormat(postSignUpReqDto.getBirthday())) throw new BaseException(BaseErrorCode.INVALID_BIRTHDAY);
             PostSignUpResDto response = authService.createUsers(postSignUpReqDto);
 
             return new BaseResponse<>(response);

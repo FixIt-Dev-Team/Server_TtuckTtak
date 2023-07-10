@@ -1,7 +1,6 @@
 package com.service.ttucktak.config.security;
 
-import com.service.ttucktak.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import com.service.ttucktak.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,17 +15,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class CustomUserDetailService implements UserDetailsService {
-
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
 
-        return userRepository.findUsersByUserID(userId);
+        return memberRepository.findMembersByUserId(userId);
     }
 }
