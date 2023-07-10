@@ -10,17 +10,22 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
 @DynamicInsert
 @DynamicUpdate
-@Entity
+@Entity(name = "member")
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -53,8 +58,9 @@ public class Member extends BaseEntity {
     @Column(name = "night_approve", nullable = false)
     private boolean nightApprove = false;
 
-    @Column(name = "refresh_token", nullable = false)
+    @Column(name = "refresh_token")
     private String refreshToken;
+
 
     @Builder
     public Member(Date createdAt, Date updatedAt, Boolean status, UUID memberIdx, String userId, String userPw, String nickname, AccountType accountType, String profileImgUrl, boolean adProvision, boolean pushApprove, boolean nightApprove, String refreshToken) {
@@ -69,5 +75,88 @@ public class Member extends BaseEntity {
         this.pushApprove = pushApprove;
         this.nightApprove = nightApprove;
         this.refreshToken = refreshToken;
+    }
+
+    public Member update(String userName, String userEmail) throws ParseException {
+
+        this.userId = userEmail;
+        this.nickname = userName;
+
+        return this;
+    }
+
+    public UUID getMemberIdx() {
+        return memberIdx;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUserPw() {
+        return userPw;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public String getProfileImgUrl() {
+        return profileImgUrl;
+    }
+
+    public boolean isAdProvision() {
+        return adProvision;
+    }
+
+    public boolean isPushApprove() {
+        return pushApprove;
+    }
+
+    public boolean isNightApprove() {
+        return nightApprove;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return userPw;
+    }
+
+    @Override
+    public String getUsername() {
+        return nickname;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }
