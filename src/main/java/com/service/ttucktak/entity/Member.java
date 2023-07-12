@@ -85,6 +85,10 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public UUID getMemberIdx() {
         return memberIdx;
     }

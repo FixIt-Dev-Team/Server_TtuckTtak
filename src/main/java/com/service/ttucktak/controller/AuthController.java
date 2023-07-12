@@ -4,7 +4,6 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
-import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auths")
@@ -41,19 +39,17 @@ public class AuthController {
     private final OAuthService oAuthService;
 
     @Autowired
-    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService){
+    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService) {
         this.jwtUtil = jwtUtil;
         this.googleJwtUtil = googleJwtUtil;
         this.authService = authService;
         this.oAuthService = oAuthService;
-
     }
 
     @GetMapping("/exception")
-    public BaseResponse<BaseException> accessExceptionHandler(){
+    public BaseResponse<BaseException> accessExceptionHandler() {
         return new BaseResponse<>(new BaseException(BaseErrorCode.AUTH_FAILED));
     }
-
 
     @Operation(summary = "회원가입", description = "유저 회원 가입을 위한 API")
     @ApiResponses(value = {
@@ -73,22 +69,23 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
-    public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto){
-        try{
+    public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto) {
+        try {
             //이메일 validation
-            if(!RegexUtil.isValidEmail(postSignUpReqDto.getUserId())) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
+            if (!RegexUtil.isValidEmail(postSignUpReqDto.getUserId()))
+                throw new BaseException(BaseErrorCode.INVALID_EMAIL);
             //비밀번호 길이 validation
-            if(postSignUpReqDto.getUserPw().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
-            if(postSignUpReqDto.getUserPw().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
+            if (postSignUpReqDto.getUserPw().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
+            if (postSignUpReqDto.getUserPw().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
             //아이디 길이 validation
-            if(postSignUpReqDto.getUserId().length() <2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
-            if(postSignUpReqDto.getUserId().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
+            if (postSignUpReqDto.getUserId().length() < 2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
+            if (postSignUpReqDto.getUserId().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
             //생일 형식 validation
             PostSignUpResDto response = authService.createUsers(postSignUpReqDto);
 
             return new BaseResponse<>(response);
 
-        }catch (BaseException exception){
+        } catch (BaseException exception) {
             log.error(Arrays.toString(exception.getStackTrace()));
 
             return new BaseResponse<>(exception);
@@ -97,16 +94,19 @@ public class AuthController {
 
     /**
      * 로그인 처리 API
-     * */
+     */
+    @Operation(summary = "로그인", description = "user id와 pw를 이용한 뚝딱 서비스 로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+    })
     @PostMapping("/login")
-    public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req){
-        try{
-            TokensDto tokensDto = authService.loginToken(req.getUserId(), req.getUserPw());
-            UUID userIdx = authService.loginUserIdx(req.getUserId());
-
-            return new BaseResponse<>(new PostLoginRes(userIdx.toString(), tokensDto));
-        }catch (BaseException exception){
-            return new BaseResponse<>(exception);
+    public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req) {
+        try {
+            PostLoginRes result = authService.login(req.getUserId(), req.getUserPw());
+            return new BaseResponse<>(result);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e);
         }
     }
 
@@ -117,20 +117,21 @@ public class AuthController {
 //    public String kakaoTest(@RequestParam("code") String code){
 //        return code;
 //    }
+
     /**
      * 카카오 회원정보 조회 및 로그인처리
-     * */
+     */
     @GetMapping("/oauth2/kakao")
-    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode){
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode) {
 
-        try{
+        try {
             String authToken = oAuthService.getKakaoAccessToken(authCode);
 
             KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
 
             return new BaseResponse<>(authService.kakaoOauth2(kakaoUserDto));
             //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
-        }catch (BaseException exception){
+        } catch (BaseException exception) {
             log.error(exception.getMessage());
             return new BaseResponse<>(exception);
         }
@@ -138,7 +139,7 @@ public class AuthController {
 
     /**
      * 구글 회원정보 조회 및 로그인 처리
-     * */
+     */
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패 오류발생.",
@@ -155,9 +156,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/oauth2/google")
-    public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString){
+    public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString) {
 
-        try{
+        try {
             GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
 
             GoogleUserDto googleUserDto = null;
@@ -172,7 +173,7 @@ public class AuthController {
 
             return new BaseResponse<>(authService.googleOauth2(googleUserDto));
             //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
-        }catch (BaseException exception){
+        } catch (BaseException exception) {
             log.error(exception.getMessage());
             return new BaseResponse<>(exception);
         }
