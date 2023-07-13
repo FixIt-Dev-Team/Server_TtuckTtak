@@ -61,7 +61,7 @@ public class AuthService {
 
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            checkAlreadyExistNickname(nickname);
+            checkNicknameExists(nickname);
 
             // 회원 가입 시작
             // 비밀번호 암호화
@@ -84,12 +84,19 @@ public class AuthService {
     }
 
     /**
-     * 이미 존재하는 닉네임인지 조회
+     * 이미 존재하는 닉네임인지 확인
      */
-    // Todo: 이미 존재하는 닉네임인지 조회하는 API 개발할 때 return 형식 변환
-    public void checkAlreadyExistNickname(String nickname) throws BaseException {
-        if (memberRepository.findByNickname(nickname).isPresent())
-            throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+    public void checkNicknameExists(String nickname) throws BaseException {
+        try {
+            if (memberRepository.findByNickname(nickname).isPresent())
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
     }
 
     /**

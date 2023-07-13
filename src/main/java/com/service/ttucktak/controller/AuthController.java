@@ -93,6 +93,36 @@ public class AuthController {
         }
     }
 
+    /**
+     * 닉네임 사용 가능 여부 확인 API
+     */
+    @Operation(summary = "닉네임 사용 가능 여부 확인", description = "해당 닉네임이 사용 가능한지 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("nickname/{nickname}")
+    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@PathVariable String nickname) {
+        try {
+            authService.checkNicknameExists(nickname);
+
+            // 사용 중인 닉네임이 없다
+            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(true);
+            return new BaseResponse<>(result);
+
+        } catch (BaseException e) {
+            if (e.getErrorCode().equals(BaseErrorCode.ALREADY_EXIST_NICKNAME)) {
+                // 사용 중인 닉네임이 있다
+                GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(false);
+                return new BaseResponse<>(result);
+
+            } else {
+                log.error(e.getMessage());
+                return new BaseResponse<>(e);
+            }
+        }
+    }
+
 //    /**
 //     * 카카오 태스트
 //     * */
