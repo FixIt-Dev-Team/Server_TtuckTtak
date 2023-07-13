@@ -8,7 +8,6 @@ import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
 import com.service.ttucktak.utils.JwtUtil;
-import com.service.ttucktak.utils.RegexUtil;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
@@ -21,8 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/auths")
@@ -55,40 +52,24 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "비밀번호가 너무 짧습니다.",
+            @ApiResponse(responseCode = "400", description = "비밀번호 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "비밀번호가 너무 깁니다.",
+            @ApiResponse(responseCode = "400", description = "닉네임 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "유저 아이디가 너무 짧습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "유저 아이디가 너무 깁니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "유저가 존재하지 않습니다.",
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
-    public BaseResponse<PostSignUpResDto> createUsers(@RequestBody PostSignUpReqDto postSignUpReqDto) {
+    public BaseResponse<PostSignUpResDto> signUp(@RequestBody PostSignUpReqDto data) {
         try {
-            //이메일 validation
-            if (!RegexUtil.isValidEmail(postSignUpReqDto.getUserId()))
-                throw new BaseException(BaseErrorCode.INVALID_EMAIL);
-            //비밀번호 길이 validation
-            if (postSignUpReqDto.getUserPw().length() < 8) throw new BaseException(BaseErrorCode.PW_TOO_SHORT);
-            if (postSignUpReqDto.getUserPw().length() > 20) throw new BaseException(BaseErrorCode.PW_TOO_LONG);
-            //아이디 길이 validation
-            if (postSignUpReqDto.getUserId().length() < 2) throw new BaseException(BaseErrorCode.ID_TOO_SHORT);
-            if (postSignUpReqDto.getUserId().length() > 10) throw new BaseException(BaseErrorCode.ID_TOO_LONG);
-            //생일 형식 validation
-            PostSignUpResDto response = authService.createUsers(postSignUpReqDto);
+            PostSignUpResDto result = authService.signUp(data);
+            return new BaseResponse<>(result);
 
-            return new BaseResponse<>(response);
-
-        } catch (BaseException exception) {
-            log.error(Arrays.toString(exception.getStackTrace()));
-
-            return new BaseResponse<>(exception);
+        } catch (BaseException e) {
+            log.error(e.getMessage());
+            return new BaseResponse<>(e);
         }
     }
 
@@ -105,7 +86,9 @@ public class AuthController {
         try {
             PostLoginRes result = authService.login(req.getUserId(), req.getUserPw());
             return new BaseResponse<>(result);
+
         } catch (BaseException e) {
+            log.error(e.getMessage());
             return new BaseResponse<>(e);
         }
     }

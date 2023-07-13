@@ -6,6 +6,7 @@ import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
+import com.service.ttucktak.utils.RegexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,25 +36,60 @@ public class AuthService {
     }
 
     /**
-     * 회원가입 - Service
+     * 회원가입 - 뚝딱 서비스 회원가입
      */
     @Transactional(rollbackFor = BaseException.class)
-    public PostSignUpResDto createUsers(PostSignUpReqDto postSignUpReqDto) throws BaseException {
-
+    public PostSignUpResDto signUp(PostSignUpReqDto data) throws BaseException {
         try {
-            postSignUpReqDto.setUserPw(passwordEncoder.encode(postSignUpReqDto.getUserPw()));
-            Member entity = postSignUpReqDto.toEntity();
+            // 이메일 형식 validation
+            // 앱을 통해 회원가입 할 때는 이메일 인증은 사전에 한 상태
+            // API를 통해 입력받을 때 이메일 인증은 못 하더라도 최소한 이메일 형태로 받을 수 있게 이메일 형식만 체크
+            // 이메일 형식에 맞지 않는 경우 invalid email exception
+            String email = data.getUserId();
+            if (!RegexUtil.isValidEmailFormat(email)) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
 
-            UUID memberIdx = memberRepository.save(entity).getMemberIdx();
-            Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
-            insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
+            // 비밀번호 형식 validation
+            // 비밀번호 형식에 맞지 않는 경우 invalid pw format exception
+            String pw = data.getUserPw();
+            if (!RegexUtil.isValidPwFormat(pw)) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
 
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
+            // 닉네임 형식 validation
+            // 닉네임 형식에 맞지 않는 경우 invalid nickname format exception
+            String nickname = data.getNickname();
+            if (!RegexUtil.isValidNicknameFormat(nickname))
+                throw new BaseException(BaseErrorCode.INVALID_NICKNAME_FORMAT);
+
+            // 동일한 닉네임 가지고 있는지 확인
+            // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
+            checkAlreadyExistNickname(nickname);
+
+            // 회원 가입 시작
+            // 비밀번호 암호화
+            String encryptedPw = passwordEncoder.encode(data.getUserPw());
+            data.setUserPw(encryptedPw);
+
+            // DB에 저장
+            Member member = data.toEntity();
+            memberRepository.save(member);
+
+            return new PostSignUpResDto(true);
+
+        } catch (BaseException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
+    }
 
-        return new PostSignUpResDto(true);
+    /**
+     * 이미 존재하는 닉네임인지 조회
+     */
+    // Todo: 이미 존재하는 닉네임인지 조회하는 API 개발할 때 return 형식 변환
+    public void checkAlreadyExistNickname(String nickname) throws BaseException {
+        if (memberRepository.findByNickname(nickname).isPresent())
+            throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
     }
 
     /**
@@ -71,7 +107,8 @@ public class AuthService {
             // 조회된 유저와 비밀번호가 일치하는지 확인
             // 비밀번호가 일치하지 않는 경우 login failed exception
             Member member = findMember.get();
-            if (!userPW.equals(member.getPassword())) throw new BaseException(BaseErrorCode.LOGIN_FAILED);
+            if (passwordEncoder.matches(userPW, member.getPassword()))
+                throw new BaseException(BaseErrorCode.LOGIN_FAILED);
 
             // 해당 계정 로그인 처리
             // access token과 refresh token 발급
@@ -117,11 +154,11 @@ public class AuthService {
         //유저 미 존재시 회원가입 후 로그인 처리
         if (!userExist) {
             try {
-                PostSignUpReqDto postSignUpReqDto =
-                        new PostSignUpReqDto(kakaoUserDto.getUserEmail(), passwordEncoder.encode(kakaoUserDto.getUserEmail()),
+                PostSocialSignUpReqDto postSocialSignUpReqDto =
+                        new PostSocialSignUpReqDto(kakaoUserDto.getUserEmail(), passwordEncoder.encode(kakaoUserDto.getUserEmail()),
                                 kakaoUserDto.getUserName(), 1);
 
-                Member entity = postSignUpReqDto.toEntity();
+                Member entity = postSocialSignUpReqDto.toEntity();
 
                 UUID memberIdx = memberRepository.save(entity).getMemberIdx();
                 Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
@@ -163,11 +200,11 @@ public class AuthService {
         //유저 미 존재시 회원가입 후 로그인 처리
         if (!userExist) {
             try {
-                PostSignUpReqDto postSignUpReqDto =
-                        new PostSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
+                PostSocialSignUpReqDto postSocialSignUpReqDto =
+                        new PostSocialSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
                                 googleUserDto.getUserName(), 2);
 
-                Member entity = postSignUpReqDto.toEntity();
+                Member entity = postSocialSignUpReqDto.toEntity();
 
                 UUID memberIdx = memberRepository.save(entity).getMemberIdx();
                 Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);

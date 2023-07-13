@@ -49,18 +49,20 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(name = "profile_img_url", nullable = false)
     private String profileImgUrl = "default url";
 
+    // 서비스 홍보 약관
     @Column(name = "ad_provision", nullable = false)
     private boolean adProvision = false;
 
+    // 이벤트 및 기능추가 Push 알림
     @Column(name = "push_approve", nullable = false)
     private boolean pushApprove = false;
 
+    // 야간시간 Push 알림
     @Column(name = "night_approve", nullable = false)
     private boolean nightApprove = false;
 
     @Column(name = "refresh_token")
     private String refreshToken;
-
 
     @Builder
     public Member(Date createdAt, Date updatedAt, Boolean status, UUID memberIdx, String userId, String userPw, String nickname, AccountType accountType, String profileImgUrl, boolean adProvision, boolean pushApprove, boolean nightApprove, String refreshToken) {
