@@ -103,6 +103,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req) {
