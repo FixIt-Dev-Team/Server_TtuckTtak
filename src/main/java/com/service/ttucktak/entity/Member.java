@@ -85,6 +85,14 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
+    public Member updateCriticalSection(String new_password_enc) throws ParseException {
+
+        this.userPw = new_password_enc;
+
+        return this;
+
+    }
+
     public UUID getMemberIdx() {
         return memberIdx;
     }
@@ -142,21 +150,21 @@ public class Member extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

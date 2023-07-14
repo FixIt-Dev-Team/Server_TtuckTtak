@@ -139,7 +139,7 @@ public class AuthController {
     /**
      * 구글 회원정보 조회 및 로그인 처리
      * */
-
+    @Operation(summary = "회원가입", description = "유저 구글 회원 가입을 위한 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패 오류발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),

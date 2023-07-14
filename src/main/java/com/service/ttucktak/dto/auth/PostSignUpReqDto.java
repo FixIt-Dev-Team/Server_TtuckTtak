@@ -5,6 +5,8 @@ import com.service.ttucktak.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,7 +33,14 @@ public class PostSignUpReqDto {
                 .userId(userId)
                 .userPw(userPw)
                 .nickname(nickname)
+                .profileImgUrl("default url")
+                .updatedAt(new Date())
+                .adProvision(true)
                 .accountType(type)
+                .pushApprove(true)
+                .refreshToken("default token")
+                .nightApprove(true)
+                .status(true)
                 .build();
     }
 }
