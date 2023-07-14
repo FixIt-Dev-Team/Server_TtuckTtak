@@ -12,6 +12,7 @@ import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
+import com.service.ttucktak.utils.RegexUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -68,6 +69,24 @@ public class AuthController {
     @PostMapping("/signup")
     public BaseResponse<PostSignUpResDto> signUp(@RequestBody PostSignUpReqDto data) {
         try {
+            // 이메일 형식 validation
+            // 앱을 통해 회원가입 할 때는 이메일 인증은 사전에 한 상태
+            // API를 통해 입력받을 때 이메일 인증은 못 하더라도 최소한 이메일 형태로 받을 수 있게 이메일 형식만 체크
+            // 이메일 형식에 맞지 않는 경우 invalid email exception
+            String email = data.getUserId();
+            if (!RegexUtil.isValidEmailFormat(email)) throw new BaseException(BaseErrorCode.INVALID_EMAIL_FORMAT);
+
+            // 비밀번호 형식 validation
+            // 비밀번호 형식에 맞지 않는 경우 invalid pw format exception
+            String pw = data.getUserPw();
+            if (!RegexUtil.isValidPwFormat(pw)) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
+
+            // 닉네임 형식 validation
+            // 닉네임 형식에 맞지 않는 경우 invalid nickname format exception
+            String nickname = data.getNickname();
+            if (!RegexUtil.isValidNicknameFormat(nickname))
+                throw new BaseException(BaseErrorCode.INVALID_NICKNAME_FORMAT);
+
             PostSignUpResDto result = authService.signUp(data);
             return new BaseResponse<>(result);
 
