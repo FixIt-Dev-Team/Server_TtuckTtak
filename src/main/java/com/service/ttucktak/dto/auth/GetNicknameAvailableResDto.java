@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PostSignUpResDto {
-    @Schema(name = "isSuccess", example = "true", description = "회원가입 성공 여부")
-    @JsonProperty("isSuccess")
-    boolean isSuccess;
+public class GetNicknameAvailableResDto {
+    @Schema(name = "isAvailable", example = "true", description = "닉네임 사용 가능 여부")
+    @JsonProperty("isAvailable")
+    boolean isAvailable;
 }

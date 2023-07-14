@@ -15,28 +15,45 @@ import java.util.Date;
 public class PostSignUpReqDto {
     @Schema(name = "userId", example = "example@example.com", requiredProperties = "true", description = "유저 아이디(이메일)")
     private String userId;
-    @Schema(name = "userPw", example = "12345678", requiredProperties = "true", description = "비밀번호(8자 이상 20자 미만)")
+    @Schema(name = "userPw", example = "12345678", requiredProperties = "true", description = "비밀번호(영문 대소문자, 숫자 특수문자 최소 한 개씩 포함 9자 이상 500자 이하)")
     private String userPw;
-    @Schema(name = "nickname", example = "nickname", requiredProperties = "true", description = "유저 닉네임(2자 이상 10자 미만)")
+    @Schema(name = "nickname", example = "nickname", requiredProperties = "true", description = "유저 닉네임(4글자 이상 12글자 미만)")
     private String nickname;
-    @Schema(name = "accountType", example = "0", requiredProperties = "true", description = "계정 타입(자체:0 카카오: 1, 구글: 2")
-    private int accountType;
+    @Schema(name = "adProvision", example = "true", requiredProperties = "true", description = "서비스 홍보 약관")
+    private boolean adProvision;
 
-    public Member toEntity(){
-        AccountType type;
-
-        if(accountType == 0) type = AccountType.DEFAULT;
-        else if(accountType == 1) type = AccountType.KAKAO;
-        else type = AccountType.GOOGLE;
-
+//  Todo: 해당 부분은 소셜로그인 sign up req/res dto 처리하며 처리
+//
+//         public Member toEntity() {
+//         return Member.builder()
+//                 .userId(userId)
+//                 .userPw(userPw)
+//                 .nickname(nickname)
+// <<<<<<< 30-auth-api-1st
+//                 .accountType(AccountType.DEFAULT)
+//                 .adProvision(adProvision)
+// =======
+//                 .profileImgUrl("default url")
+//                 .updatedAt(new Date())
+//                 .adProvision(true)
+//                 .accountType(type)
+//                 .pushApprove(true)
+//                 .refreshToken("default token")
+//                 .nightApprove(true)
+//                 .status(true)
+// >>>>>>> develop
+//                 .build();
+//     }
+    
+    public Member toEntity() {
         return Member.builder()
                 .userId(userId)
                 .userPw(userPw)
                 .nickname(nickname)
+                .accountType(AccountType.DEFAULT)
+                .adProvision(adProvision)
                 .profileImgUrl("default url")
                 .updatedAt(new Date())
-                .adProvision(true)
-                .accountType(type)
                 .pushApprove(true)
                 .refreshToken("default token")
                 .nightApprove(true)
