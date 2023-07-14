@@ -85,6 +85,14 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
+    public Member updateCriticalSection(String new_password_enc) throws ParseException {
+
+        this.userPw = new_password_enc;
+
+        return this;
+
+    }
+
     public UUID getMemberIdx() {
         return memberIdx;
     }

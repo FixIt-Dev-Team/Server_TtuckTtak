@@ -23,7 +23,7 @@ public enum BaseErrorCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "아이디나 비밀번호를 확인해주세요"),
-    UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "userIdx값에 오류 발생"),
+    UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "userIdx 값에 오류 발생"),
 
 
     /**
@@ -47,6 +47,7 @@ public enum BaseErrorCode {
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생하였습니다."),
     GOOGLE_GENERALSECURITY_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 구글 시큐리티 문제가 발생하였습니다."),
     MEMBER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다."),
+    PWUPDATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "패스워드 업데이트 처리중 예상치 못한 에러가 발생하였습니다."),
     GOOGLE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 IO 문제가 발생하였습니다.");
     /**
      *
