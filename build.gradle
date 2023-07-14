@@ -74,6 +74,9 @@ dependencies {
 
     //GoogleAPI
     implementation 'com.google.api-client:google-api-client:1.33.0'
+
+    //Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 jar {

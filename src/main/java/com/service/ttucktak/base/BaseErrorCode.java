@@ -19,7 +19,8 @@ public enum BaseErrorCode {
     INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST.value(), "닉네임 형식에 맞지 않습니다."),
     ID_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 짧습니다."),
     ID_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 깁니다."),
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 이메일입니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "아이디나 비밀번호를 확인해주세요"),
 

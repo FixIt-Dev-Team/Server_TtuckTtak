@@ -6,6 +6,7 @@ import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
+import com.service.ttucktak.service.EmailService;
 import com.service.ttucktak.utils.GoogleJwtUtil;
 import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
@@ -35,12 +36,15 @@ public class AuthController {
 
     private final OAuthService oAuthService;
 
+    private final EmailService emailService;
+
     @Autowired
-    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService) {
+    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService, EmailService emailService) {
         this.jwtUtil = jwtUtil;
         this.googleJwtUtil = googleJwtUtil;
         this.authService = authService;
         this.oAuthService = oAuthService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/exception")
@@ -89,6 +93,24 @@ public class AuthController {
 
         } catch (BaseException e) {
             log.error(e.getMessage());
+            return new BaseResponse<>(e);
+        }
+    }
+
+    @Operation(summary = "이메일 인증", description = "회원 가입시 유효한 이메일인지 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+    })
+    @PostMapping("/email-confirm")
+    public BaseResponse<PostEmailConfirmResDto> emailConfirm(@RequestParam String to) {
+        try {
+            String ePw = emailService.sendSimpleMessage(to);
+            PostEmailConfirmResDto result = new PostEmailConfirmResDto(ePw);
+            return new BaseResponse<>(result);
+
+        } catch (BaseException e) {
+            e.printStackTrace();
             return new BaseResponse<>(e);
         }
     }

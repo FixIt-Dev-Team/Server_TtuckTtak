@@ -33,6 +33,7 @@ public class IgnoreSecurityConfig {
                 .authorizeHttpRequests() //Http Request를 인가하라
                 .requestMatchers("/api/auths/signup").permitAll()
                 .requestMatchers("/api/auths/login").permitAll()
+                .requestMatchers("/api/auths/email-confirm").permitAll()
                 .requestMatchers("/api/auths/nickname/**").permitAll()
                 .requestMatchers("/api/auths/oauth2/kakao").permitAll()
                 .requestMatchers("/api/auths/oauth2/kakao/test").permitAll()

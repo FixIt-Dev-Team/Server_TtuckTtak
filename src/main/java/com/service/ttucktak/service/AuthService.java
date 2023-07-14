@@ -46,7 +46,7 @@ public class AuthService {
             // API를 통해 입력받을 때 이메일 인증은 못 하더라도 최소한 이메일 형태로 받을 수 있게 이메일 형식만 체크
             // 이메일 형식에 맞지 않는 경우 invalid email exception
             String email = data.getUserId();
-            if (!RegexUtil.isValidEmailFormat(email)) throw new BaseException(BaseErrorCode.INVALID_EMAIL);
+            if (!RegexUtil.isValidEmailFormat(email)) throw new BaseException(BaseErrorCode.INVALID_EMAIL_FORMAT);
 
             // 비밀번호 형식 validation
             // 비밀번호 형식에 맞지 않는 경우 invalid pw format exception
