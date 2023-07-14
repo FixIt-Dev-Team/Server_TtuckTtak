@@ -9,6 +9,7 @@ import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
 import com.service.ttucktak.dto.user.UserDataDto;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,7 +45,7 @@ public class ViewController {
         소올직히 지금 유저 히스토리 DB 준비가 안되서 좀 기다려야 것음.
     }*/
 
-
+    @Operation(summary = "VIEW API", description = "설정 view 유저정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -67,6 +68,7 @@ public class ViewController {
 
     }
 
+    @Operation(summary = "VIEW API", description = "설정 view 유저 정보 업데이트 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -106,6 +108,8 @@ public class ViewController {
         return new BaseResponse<>(userDetailService.updateUserByUUID(userIdx,reqDto));
 
     }
+
+    @Operation(summary = "VIEW API", description = "설정 view 유저 비밀번호 변경 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
