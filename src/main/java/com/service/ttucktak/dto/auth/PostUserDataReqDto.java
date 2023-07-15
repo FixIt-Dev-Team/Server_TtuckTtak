@@ -16,7 +16,7 @@ public class PostUserDataReqDto {
     private String userIdx;
     @Schema(name = "nickName", example = "WaGaNaWaMGM", requiredProperties = "true", description = "변경할 유저 닉네임")
     private String nickName;
-    @Schema(name = "imgUrl", example = "12345678", requiredProperties = "true", description = "업로드된 ")
-    private boolean imgUpdate;
+    @Schema(name = "imgUrl", example = "12345678", requiredProperties = "true", description = "유저 프로필 업로드 (요청시 기본 null 처리 요망)")
+    private String imgUpdate;
 
 }

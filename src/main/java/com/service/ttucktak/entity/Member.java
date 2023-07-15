@@ -2,6 +2,7 @@ package com.service.ttucktak.entity;
 
 import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseEntity;
+import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -83,6 +84,16 @@ public class Member extends BaseEntity implements UserDetails {
 
         this.userId = userEmail;
         this.nickname = userName;
+
+        return this;
+    }
+
+    public Member update(PostUserDataReqDto dto) throws ParseException {
+
+        this.nickname = dto.getNickName();
+        if(dto.getImgUpdate() != null){
+            this.profileImgUrl = dto.getImgUpdate();
+        }
 
         return this;
     }
