@@ -88,23 +88,19 @@ public class AuthService {
     public PostLoginRes login(String userID, String userPW) throws BaseException {
         try {
             // user Id를 기반으로 회원이 있는지 조회
-            Optional<Member> findMember = memberRepository.findByUserId(userID);
-
-            // user id로 유저 조회
             // 조회되는 유저가 없다면 login failed exception
-            if (findMember.isEmpty()) throw new BaseException(BaseErrorCode.LOGIN_FAILED);
+            Member member = memberRepository.findByUserId(userID)
+                    .orElseThrow(() -> new BaseException(BaseErrorCode.LOGIN_FAILED));
 
             // 조회된 유저와 비밀번호가 일치하는지 확인
             // 비밀번호가 일치하지 않는 경우 login failed exception
-            Member member = findMember.get();
             if (passwordEncoder.matches(userPW, member.getPassword()))
                 throw new BaseException(BaseErrorCode.LOGIN_FAILED);
 
             // 해당 계정 로그인 처리
             // access token과 refresh token 발급
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getUserId(), member.getUserId());
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            TokensDto tokens = jwtUtil.createTokens(authentication);
+            // Todo: principal과 credentials에 어떤 값을 넣어줄지 고민해볼 것
+            TokensDto tokens = generateToken(member.getUserId(), member.getUserId());
 
             // 사용자의 refresh token 업데이트
             member.updateRefreshToken(tokens.getRefreshToken());
@@ -134,6 +130,15 @@ public class AuthService {
         return memberIdx.get();
     }
 
+    /**
+     * 토큰 발행
+     */
+    public TokensDto generateToken(Object principal, Object credentials) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(principal, credentials);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        return jwtUtil.createTokens(authentication);
+    }
+
     public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
         boolean userExist = false;
 
@@ -155,11 +160,6 @@ public class AuthService {
 
                 memberRepository.save(entity);
 
-                // 제대로 추가되었는지 확인하는 코드 -> Test code로 위치 변경
-//                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
-//                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
-//                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-
             } catch (Exception exception) {
                 log.error(exception.getMessage());
                 throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -168,12 +168,7 @@ public class AuthService {
 
         //로그인 처리
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(kakaoUserDto.getUserEmail(), kakaoUserDto.getUserEmail());
-
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-            TokensDto token = jwtUtil.createTokens(authentication);
-
+            TokensDto token = generateToken(kakaoUserDto.getUserEmail(), kakaoUserDto.getUserEmail());
             UUID userIdx = loginUserIdx(kakaoUserDto.getUserEmail());
 
             return new PostLoginRes(userIdx.toString(), token);
@@ -204,11 +199,6 @@ public class AuthService {
 
                 memberRepository.save(entity);
 
-                // 제대로 추가되었는지 확인하는 코드 -> Test code로 위치 변경
-//                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
-//                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
-//                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-
             } catch (Exception exception) {
                 log.error(exception.getMessage());
                 throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -217,12 +207,7 @@ public class AuthService {
 
         //로그인 처리
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
-
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-            TokensDto token = jwtUtil.createTokens(authentication);
-
+            TokensDto token = generateToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
             UUID userIdx = loginUserIdx(googleUserDto.getUserEmail());
 
             return new PostLoginRes(userIdx.toString(), token);
