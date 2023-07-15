@@ -22,29 +22,6 @@ public class PostSignUpReqDto {
     @Schema(name = "adProvision", example = "true", requiredProperties = "true", description = "서비스 홍보 약관")
     private boolean adProvision;
 
-//  Todo: 해당 부분은 소셜로그인 sign up req/res dto 처리하며 처리
-//
-//         public Member toEntity() {
-//         return Member.builder()
-//                 .userId(userId)
-//                 .userPw(userPw)
-//                 .nickname(nickname)
-// <<<<<<< 30-auth-api-1st
-//                 .accountType(AccountType.DEFAULT)
-//                 .adProvision(adProvision)
-// =======
-//                 .profileImgUrl("default url")
-//                 .updatedAt(new Date())
-//                 .adProvision(true)
-//                 .accountType(type)
-//                 .pushApprove(true)
-//                 .refreshToken("default token")
-//                 .nightApprove(true)
-//                 .status(true)
-// >>>>>>> develop
-//                 .build();
-//     }
-    
     public Member toEntity() {
         return Member.builder()
                 .userId(userId)

@@ -1,12 +1,12 @@
 package com.service.ttucktak.service;
 
+import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
-import com.service.ttucktak.utils.RegexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,8 +43,7 @@ public class AuthService {
         try {
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            String nickname = data.getNickname();
-            checkNicknameExists(nickname);
+            checkNicknameExists(data.getNickname());
 
             // 회원 가입 시작
             // 비밀번호 암호화
@@ -107,9 +106,7 @@ public class AuthService {
 
             // 로그인 결과 반환 (userIdx, 토큰 반환)
             String userIdx = member.getMemberIdx().toString();
-            PostLoginRes result = new PostLoginRes(userIdx, tokens);
-
-            return result;
+            return new PostLoginRes(userIdx, tokens);
 
         } catch (BaseException e) {
             log.error(e.getMessage());
@@ -140,7 +137,7 @@ public class AuthService {
     }
 
     public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
-        boolean userExist = false;
+        boolean userExist;
 
         try {
             userExist = memberRepository.existsMemberByUserId(kakaoUserDto.getUserEmail());
@@ -149,16 +146,17 @@ public class AuthService {
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
 
-        //유저 미 존재시 회원가입 후 로그인 처리
+        // 유저 미 존재시 회원가입 후 로그인 처리
         if (!userExist) {
             try {
-                PostSocialSignUpReqDto postSocialSignUpReqDto =
-                        new PostSocialSignUpReqDto(kakaoUserDto.getUserEmail(), passwordEncoder.encode(kakaoUserDto.getUserEmail()),
-                                kakaoUserDto.getUserName(), 1);
+                Member member = Member.builder()
+                        .userId(kakaoUserDto.getUserEmail())
+                        .userPw(passwordEncoder.encode(kakaoUserDto.getUserEmail()))
+                        .nickname(kakaoUserDto.getUserName())
+                        .accountType(AccountType.KAKAO)
+                        .build();
 
-                Member entity = postSocialSignUpReqDto.toEntity();
-
-                memberRepository.save(entity);
+                memberRepository.save(member);
 
             } catch (Exception exception) {
                 log.error(exception.getMessage());
@@ -171,6 +169,8 @@ public class AuthService {
             TokensDto token = generateToken(kakaoUserDto.getUserEmail(), kakaoUserDto.getUserEmail());
             UUID userIdx = loginUserIdx(kakaoUserDto.getUserEmail());
 
+            // Todo: refresh token 설정
+
             return new PostLoginRes(userIdx.toString(), token);
         } catch (Exception exception) {
             log.error(exception.getMessage());
@@ -179,7 +179,7 @@ public class AuthService {
     }
 
     public PostLoginRes googleOauth2(GoogleUserDto googleUserDto) throws BaseException {
-        boolean userExist = false;
+        boolean userExist;
 
         try {
             userExist = memberRepository.existsMemberByUserId(googleUserDto.getUserEmail());
@@ -188,16 +188,17 @@ public class AuthService {
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
 
-        //유저 미 존재시 회원가입 후 로그인 처리
+        // 유저 미 존재시 회원가입 후 로그인 처리
         if (!userExist) {
             try {
-                PostSocialSignUpReqDto postSocialSignUpReqDto =
-                        new PostSocialSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
-                                googleUserDto.getUserName(), 2);
+                Member member = Member.builder()
+                        .userId(googleUserDto.getUserEmail())
+                        .userPw(passwordEncoder.encode(googleUserDto.getUserEmail()))
+                        .nickname(googleUserDto.getUserName())
+                        .accountType(AccountType.GOOGLE)
+                        .build();
 
-                Member entity = postSocialSignUpReqDto.toEntity();
-
-                memberRepository.save(entity);
+                memberRepository.save(member);
 
             } catch (Exception exception) {
                 log.error(exception.getMessage());
@@ -209,6 +210,8 @@ public class AuthService {
         try {
             TokensDto token = generateToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
             UUID userIdx = loginUserIdx(googleUserDto.getUserEmail());
+
+            // Todo: refresh token 설정
 
             return new PostLoginRes(userIdx.toString(), token);
         } catch (Exception exception) {
