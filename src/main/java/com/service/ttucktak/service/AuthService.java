@@ -16,9 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 @Slf4j
 public class AuthService {
@@ -118,16 +115,6 @@ public class AuthService {
     }
 
     /**
-     * 로그인한 멤버 인덱스 가져오기
-     */
-    public UUID loginUserIdx(String userID) throws BaseException {
-        Optional<UUID> memberIdx = memberRepository.findMemberIdxById(userID);
-        memberIdx.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-
-        return memberIdx.get();
-    }
-
-    /**
      * 토큰 발행
      */
     public TokensDto generateToken(Object principal, Object credentials) {
@@ -136,87 +123,67 @@ public class AuthService {
         return jwtUtil.createTokens(authentication);
     }
 
-    public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
-        boolean userExist;
-
+    /**
+     * 카카오로 로그인 한 사용자 로그인 처리
+     */
+    public PostLoginRes kakaoOauth2(KakaoUserDto data) throws BaseException {
         try {
-            userExist = memberRepository.existsMemberByUserId(kakaoUserDto.getUserEmail());
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
+            // 카카오 이메일을 기반으로 사용자를 조회한다
+            // 만약 조회된 결과가 없으면 사용자를 생성하고 DB에 저장한다
+            Member member = memberRepository.findByUserId(data.getUserEmail())
+                    .orElseGet(() -> {
+                        Member newMember = Member.builder()
+                                .userId(data.getUserEmail())
+                                .userPw(passwordEncoder.encode(data.getUserEmail()))
+                                .nickname(data.getUserName())
+                                .accountType(AccountType.KAKAO)
+                                .build();
+
+                        return memberRepository.save(newMember);
+                    });
+
+            // --- 로그인 처리 ---
+            // 토큰을 발급받고, refresh token을 DB에 저장한다.
+            TokensDto token = generateToken(member.getUserId(), member.getUserId());
+            member.updateRefreshToken(token.getRefreshToken());
+
+            return new PostLoginRes(member.getMemberIdx().toString(), token);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
-        // 유저 미 존재시 회원가입 후 로그인 처리
-        if (!userExist) {
-            try {
-                Member member = Member.builder()
-                        .userId(kakaoUserDto.getUserEmail())
-                        .userPw(passwordEncoder.encode(kakaoUserDto.getUserEmail()))
-                        .nickname(kakaoUserDto.getUserName())
-                        .accountType(AccountType.KAKAO)
-                        .build();
-
-                memberRepository.save(member);
-
-            } catch (Exception exception) {
-                log.error(exception.getMessage());
-                throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-            }
-        }
-
-        //로그인 처리
-        try {
-            TokensDto token = generateToken(kakaoUserDto.getUserEmail(), kakaoUserDto.getUserEmail());
-            UUID userIdx = loginUserIdx(kakaoUserDto.getUserEmail());
-
-            // Todo: refresh token 설정
-
-            return new PostLoginRes(userIdx.toString(), token);
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
         }
     }
 
-    public PostLoginRes googleOauth2(GoogleUserDto googleUserDto) throws BaseException {
-        boolean userExist;
-
+    /**
+     * 구글로 로그인 한 사용자 로그인 처리
+     */
+    public PostLoginRes googleOauth2(GoogleUserDto data) throws BaseException {
         try {
-            userExist = memberRepository.existsMemberByUserId(googleUserDto.getUserEmail());
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
+            // 구글 이메일을 기반으로 사용자를 조회한다
+            // 만약 조회된 결과가 없으면 사용자를 생성하고 DB에 저장한다
+            Member member = memberRepository.findByUserId(data.getUserEmail())
+                    .orElseGet(() -> {
+                        Member newMember = Member.builder()
+                                .userId(data.getUserEmail())
+                                .userPw(passwordEncoder.encode(data.getUserEmail()))
+                                .nickname(data.getUserName())
+                                .accountType(AccountType.GOOGLE)
+                                .build();
+
+                        return memberRepository.save(newMember);
+                    });
+
+            // --- 로그인 처리 ---
+            // 토큰을 발급받고, refresh token을 DB에 저장한다.
+            TokensDto token = generateToken(member.getUserId(), member.getUserId());
+            member.updateRefreshToken(token.getRefreshToken());
+
+            return new PostLoginRes(member.getMemberIdx().toString(), token);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
-        // 유저 미 존재시 회원가입 후 로그인 처리
-        if (!userExist) {
-            try {
-                Member member = Member.builder()
-                        .userId(googleUserDto.getUserEmail())
-                        .userPw(passwordEncoder.encode(googleUserDto.getUserEmail()))
-                        .nickname(googleUserDto.getUserName())
-                        .accountType(AccountType.GOOGLE)
-                        .build();
-
-                memberRepository.save(member);
-
-            } catch (Exception exception) {
-                log.error(exception.getMessage());
-                throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-            }
-        }
-
-        //로그인 처리
-        try {
-            TokensDto token = generateToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
-            UUID userIdx = loginUserIdx(googleUserDto.getUserEmail());
-
-            // Todo: refresh token 설정
-
-            return new PostLoginRes(userIdx.toString(), token);
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
         }
     }
 }
