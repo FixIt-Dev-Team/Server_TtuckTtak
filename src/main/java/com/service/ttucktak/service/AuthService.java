@@ -153,9 +153,12 @@ public class AuthService {
 
                 Member entity = postSocialSignUpReqDto.toEntity();
 
-                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
-                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
-                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
+                memberRepository.save(entity);
+
+                // 제대로 추가되었는지 확인하는 코드 -> Test code로 위치 변경
+//                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
+//                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
+//                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
 
             } catch (Exception exception) {
                 log.error(exception.getMessage());
@@ -199,9 +202,12 @@ public class AuthService {
 
                 Member entity = postSocialSignUpReqDto.toEntity();
 
-                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
-                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
-                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
+                memberRepository.save(entity);
+
+                // 제대로 추가되었는지 확인하는 코드 -> Test code로 위치 변경
+//                UUID memberIdx = memberRepository.save(entity).getMemberIdx();
+//                Optional<Member> insertedEntity = memberRepository.findByMemberIdx(memberIdx);
+//                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
 
             } catch (Exception exception) {
                 log.error(exception.getMessage());
