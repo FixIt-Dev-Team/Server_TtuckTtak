@@ -65,11 +65,13 @@ public class CustomUserDetailService implements UserDetailsService {
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
         try{
-            currentUser.update(dto.getNickName(),currentUser.getUserId());
+            currentUser.update(dto);
         }catch (Exception exception){
             log.error("Member update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
+
+
         try{
             memberRepository.save(currentUser);
         }catch (Exception exception){

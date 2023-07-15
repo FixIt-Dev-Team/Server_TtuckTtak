@@ -9,6 +9,7 @@ import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
 import com.service.ttucktak.dto.user.UserDataDto;
+import com.service.ttucktak.utils.S3Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,10 +35,13 @@ public class ViewController {
 
     private FileService fileService;
 
+    private S3Util s3Util;
+
     @Autowired
-    public ViewController(CustomUserDetailService userDetailService, FileService fileService){
+    public ViewController(CustomUserDetailService userDetailService, FileService fileService, S3Util s3Util){
         this.userDetailService = userDetailService;
         this.fileService = fileService;
+        this.s3Util = s3Util;
     }
 
     /*@GetMapping("/main")
@@ -87,12 +91,19 @@ public class ViewController {
 
         if(file != null){
 
+            String userImgUrl;
+
             try{
-                fileService.fileUpload(file);
+
+                userImgUrl = s3Util.upload(file,"S3UserProfile_develop");
+
             }catch (Exception exception){
-                log.error("파일 저장중 문제 발생 : " + exception.getMessage());
+                log.error("S3 이미지 파일 저장중 문제 발생 : " + exception.getMessage());
                 throw new BaseException(BaseErrorCode.UNEXPECTED_ERROR);
             }
+
+            reqDto.setImgUpdate(userImgUrl);
+
             // 차후 이미지 DB 준비 마무리 되면 그때 추가 작업.
         }
 
