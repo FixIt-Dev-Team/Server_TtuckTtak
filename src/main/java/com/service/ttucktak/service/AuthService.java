@@ -130,11 +130,11 @@ public class AuthService {
     }
 
     /**
-     * 카카오로 로그인 한 사용자 로그인 처리
+     * 로그인 - 소셜 계정
      */
-    public PostLoginRes kakaoOauth2(KakaoUserDto data) throws BaseException {
+    public PostLoginRes loginWithSocialAccount(SocialAccountUserInfo data, AccountType type) throws BaseException {
         try {
-            // 카카오 이메일을 기반으로 사용자를 조회한다
+            // 이메일(user id)을 기반으로 사용자를 조회한다
             // 만약 조회된 결과가 없으면 사용자를 생성하고 DB에 저장한다
             Member member = memberRepository.findByUserId(data.getUserEmail())
                     .orElseGet(() -> {
@@ -142,39 +142,12 @@ public class AuthService {
                                 .userId(data.getUserEmail())
                                 .userPw(passwordEncoder.encode(data.getUserEmail()))
                                 .nickname(data.getUserName())
-                                .accountType(AccountType.KAKAO)
-                                .build();
-
-                        return memberRepository.save(newMember);
-                    });
-
-            // --- 로그인 처리 ---
-            // 토큰을 발급받고, refresh token을 DB에 저장한다.
-            TokensDto token = generateToken(member.getUserId(), member.getUserId());
-            member.updateRefreshToken(token.getRefreshToken());
-
-            return new PostLoginRes(member.getMemberIdx().toString(), token);
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-    }
-
-    /**
-     * 구글로 로그인 한 사용자 로그인 처리
-     */
-    public PostLoginRes googleOauth2(GoogleUserDto data) throws BaseException {
-        try {
-            // 구글 이메일을 기반으로 사용자를 조회한다
-            // 만약 조회된 결과가 없으면 사용자를 생성하고 DB에 저장한다
-            Member member = memberRepository.findByUserId(data.getUserEmail())
-                    .orElseGet(() -> {
-                        Member newMember = Member.builder()
-                                .userId(data.getUserEmail())
-                                .userPw(passwordEncoder.encode(data.getUserEmail()))
-                                .nickname(data.getUserName())
-                                .accountType(AccountType.GOOGLE)
+                                .accountType(type)
+                                .adProvision(false)
+                                .profileImgUrl(data.getImgURL())
+                                .pushApprove(false)
+                                .nightApprove(false)
+                                .status(true)
                                 .build();
 
                         return memberRepository.save(newMember);
