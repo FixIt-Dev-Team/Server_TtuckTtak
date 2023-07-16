@@ -95,7 +95,7 @@ public class AuthService {
 
             // 조회된 유저와 비밀번호가 일치하는지 확인
             // 비밀번호가 일치하지 않는 경우 login failed exception
-            if (passwordEncoder.matches(userPW, member.getPassword()))
+            if (!passwordEncoder.matches(userPW, member.getPassword()))
                 throw new BaseException(BaseErrorCode.LOGIN_FAILED);
 
             // 해당 계정 로그인 처리
