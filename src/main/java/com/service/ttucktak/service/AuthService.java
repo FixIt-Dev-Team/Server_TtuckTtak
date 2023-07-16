@@ -45,7 +45,8 @@ public class AuthService {
 
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            checkNicknameExists(data.getNickname());
+            if (checkNicknameExists(data.getNickname()))
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
 
             // 회원 가입 시작
             // 비밀번호 암호화
@@ -70,13 +71,10 @@ public class AuthService {
     /**
      * 이미 존재하는 닉네임인지 확인
      */
-    public void checkNicknameExists(String nickname) throws BaseException {
+    public boolean checkNicknameExists(String nickname) throws BaseException {
         try {
-            if (memberRepository.findByNickname(nickname).isPresent())
-                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+            return memberRepository.existsMemberByNickname(nickname);
 
-        } catch (BaseException e) {
-            throw e;
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -141,7 +139,7 @@ public class AuthService {
                         Member newMember = Member.builder()
                                 .userId(data.getUserEmail())
                                 .userPw(passwordEncoder.encode(data.getUserEmail()))
-                                .nickname(data.getUserName())
+                                .nickname(data.getUserName()) // Todo: 동명이인 처리???
                                 .accountType(type)
                                 .adProvision(false)
                                 .profileImgUrl(data.getImgURL())

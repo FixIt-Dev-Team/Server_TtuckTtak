@@ -148,22 +148,13 @@ public class AuthController {
     @GetMapping("nickname/{nickname}")
     public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@PathVariable String nickname) {
         try {
-            authService.checkNicknameExists(nickname);
-
-            // 사용 중인 닉네임이 없다
-            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(true);
+            boolean isAvailable = !authService.checkNicknameExists(nickname);
+            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
             return new BaseResponse<>(result);
 
         } catch (BaseException e) {
-            if (e.getErrorCode().equals(BaseErrorCode.ALREADY_EXIST_NICKNAME)) {
-                // 사용 중인 닉네임이 있다
-                GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(false);
-                return new BaseResponse<>(result);
-
-            } else {
-                log.error(e.getMessage());
-                return new BaseResponse<>(e);
-            }
+            log.error(e.getMessage());
+            return new BaseResponse<>(e);
         }
     }
 

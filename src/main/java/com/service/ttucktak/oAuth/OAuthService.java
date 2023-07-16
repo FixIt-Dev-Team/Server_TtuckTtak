@@ -125,15 +125,6 @@ public class OAuthService {
                 email = object.get("kakao_account").getAsJsonObject().get("email").getAsString();
             else throw new BaseException(BaseErrorCode.KAKAO_EMAIL_NOT_EXIST);
 
-            //생일 -> 카카오 로그인 비즈앱 인증 받아야 재대로 받아올 수 있음
-            // 현재 기획안에서 생일 사용 폐지
-//            String birthday = object.get("kakao_account").getAsJsonObject().get("birthday").getAsString();
-//
-//            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//
-//            String[] temp = birthday.split("");
-//            Date date = format.parse("1998" + "-" + temp[0] + temp[1] + "-" + temp[2] + temp[3]);
-
             String nickName = object.get("kakao_account")
                     .getAsJsonObject().get("profile")
                     .getAsJsonObject().get("nickname").getAsString();
