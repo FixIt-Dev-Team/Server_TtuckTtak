@@ -38,6 +38,11 @@ public class AuthService {
     @Transactional(rollbackFor = BaseException.class)
     public PostSignUpResDto signUp(PostSignUpReqDto data) throws BaseException {
         try {
+            // 동일한 아이디가 있는지 확인
+            // 이미 동일한 아이디가 존재하는 경우 already exist id exception
+            if (memberRepository.findByUserId(data.getUserId()).isPresent())
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_ID);
+
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
             checkNicknameExists(data.getNickname());
@@ -106,9 +111,11 @@ public class AuthService {
             return new PostLoginRes(userIdx, tokens);
 
         } catch (BaseException e) {
+            e.getCause();
             log.error(e.getMessage());
             throw new BaseException(e.getErrorCode());
         } catch (Exception e) {
+            e.getCause();
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
