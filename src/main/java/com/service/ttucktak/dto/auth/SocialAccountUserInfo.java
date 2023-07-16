@@ -4,15 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Date;
-
-
 @Getter
 @Builder
 @ToString
-public class KakaoUserDto {
+public class SocialAccountUserInfo {
     private final String userName;
     private final String userEmail;
-    private Date birthday;
-    private static int accountType;
+    private final String imgURL;
 }

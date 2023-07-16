@@ -1,5 +1,6 @@
 package com.service.ttucktak.controller;
 
+import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
@@ -147,22 +148,13 @@ public class AuthController {
     @GetMapping("nickname/{nickname}")
     public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@PathVariable String nickname) {
         try {
-            authService.checkNicknameExists(nickname);
-
-            // 사용 중인 닉네임이 없다
-            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(true);
+            boolean isAvailable = !authService.checkNicknameExists(nickname);
+            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
             return new BaseResponse<>(result);
 
         } catch (BaseException e) {
-            if (e.getErrorCode().equals(BaseErrorCode.ALREADY_EXIST_NICKNAME)) {
-                // 사용 중인 닉네임이 있다
-                GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(false);
-                return new BaseResponse<>(result);
-
-            } else {
-                log.error(e.getMessage());
-                return new BaseResponse<>(e);
-            }
+            log.error(e.getMessage());
+            return new BaseResponse<>(e);
         }
     }
 
@@ -183,9 +175,9 @@ public class AuthController {
         try {
             String authToken = oAuthService.getKakaoAccessToken(authCode);
 
-            KakaoUserDto kakaoUserDto = oAuthService.getKakaoUserInfo(authToken);
+            SocialAccountUserInfo data = oAuthService.getKakaoUserInfo(authToken);
 
-            return new BaseResponse<>(authService.kakaoOauth2(kakaoUserDto));
+            return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.KAKAO));
             //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
         } catch (BaseException exception) {
             log.error(exception.getMessage());
@@ -217,17 +209,17 @@ public class AuthController {
         try {
             GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
 
-            GoogleUserDto googleUserDto = null;
+            SocialAccountUserInfo data;
 
             if (idToken != null) {
 
-                googleUserDto = oAuthService.getGoogleUserInfo(idToken);
+                data = oAuthService.getGoogleUserInfo(idToken);
 
             } else {
                 throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_EXPIRE);
             }
 
-            return new BaseResponse<>(authService.googleOauth2(googleUserDto));
+            return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.GOOGLE));
             //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
         } catch (BaseException exception) {
             log.error(exception.getMessage());

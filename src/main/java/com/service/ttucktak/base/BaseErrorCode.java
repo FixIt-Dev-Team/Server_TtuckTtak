@@ -39,6 +39,7 @@ public enum BaseErrorCode {
     /**
      * 409 : Conflict
      */
+    ALREADY_EXIST_ID(HttpStatus.NOT_FOUND.value(), "이미 존재하는 아이디입니다."),
     ALREADY_EXIST_NICKNAME(HttpStatus.NOT_FOUND.value(), "이미 존재하는 닉네임입니다."),
 
     /**

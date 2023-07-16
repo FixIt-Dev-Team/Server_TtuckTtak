@@ -5,8 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
-import com.service.ttucktak.dto.auth.GoogleUserDto;
-import com.service.ttucktak.dto.auth.KakaoUserDto;
+import com.service.ttucktak.dto.auth.SocialAccountUserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 @Slf4j
@@ -33,11 +30,11 @@ public class OAuthService {
 
     /**
      * 카카오 토큰받기
-     * */
+     */
     public String getKakaoAccessToken(String authCode) throws BaseException {
         String accessToken = "";
 
-        try{
+        try {
             URL url = new URL(tokenReqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -68,7 +65,7 @@ public class OAuthService {
             String line;
             StringBuilder result = new StringBuilder();
 
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 result.append(line);
             }
             log.info("response at Kakao OAuth Token :" + result.toString());
@@ -81,7 +78,7 @@ public class OAuthService {
             br.close();
             bw.close();
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             log.error(exception.getMessage());
             throw new BaseException(BaseErrorCode.KAKAO_OAUTH_ERROR);
         }
@@ -91,9 +88,9 @@ public class OAuthService {
 
     /**
      * 카카오 정보 받기
-     * */
-    public KakaoUserDto getKakaoUserInfo(String authToken) throws BaseException{
-        try{
+     */
+    public SocialAccountUserInfo getKakaoUserInfo(String authToken) throws BaseException {
+        try {
             //Target URL
             URL url = new URL(infoReqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -112,7 +109,7 @@ public class OAuthService {
             String line;
             StringBuilder result = new StringBuilder();
 
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 result.append(line);
             }
 
@@ -124,39 +121,35 @@ public class OAuthService {
             //이메일 있는지 여부
             boolean hasEmail = object.get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             String email;
-            if(hasEmail)
+            if (hasEmail)
                 email = object.get("kakao_account").getAsJsonObject().get("email").getAsString();
             else throw new BaseException(BaseErrorCode.KAKAO_EMAIL_NOT_EXIST);
-
-            //생일 -> 카카오 로그인 비즈앱 인증 받아야 재대로 받아올 수 있음
-            String birthday = object.get("kakao_account").getAsJsonObject().get("birthday").getAsString();
-
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-            String[] temp = birthday.split("");
-            Date date = format.parse("1998" + "-" + temp[0] + temp[1] + "-" + temp[2] + temp[3]);
 
             String nickName = object.get("kakao_account")
                     .getAsJsonObject().get("profile")
                     .getAsJsonObject().get("nickname").getAsString();
 
-            KakaoUserDto res = KakaoUserDto.builder().userEmail(email).userName(nickName).birthday(date).build();
+            SocialAccountUserInfo res = SocialAccountUserInfo.builder()
+                    .userName(nickName)
+                    .userEmail(email)
+                    .imgURL("Todo") // Todo: 프로필 이미지 받아오기
+                    .build();
 
             log.info(res.toString());
 
             return res;
             //카카오 유저 정보 파싱 - end
 
-        }catch (BaseException exception){
+        } catch (BaseException exception) {
             throw exception;
-        } catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Exception in getKakaoUserInfo : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.KAKAO_OAUTH_ERROR);
         }
     }
 
-    public GoogleUserDto getGoogleUserInfo(GoogleIdToken idToken) throws BaseException{
-        try{
+    public SocialAccountUserInfo getGoogleUserInfo(GoogleIdToken idToken) throws BaseException {
+        try {
 
             GoogleIdToken.Payload payload = idToken.getPayload();
 
@@ -172,14 +165,18 @@ public class OAuthService {
 
             log.info("user info | name :" + name + " | email : " + email + " | imgURL : " + pictureUrl);
 
-            GoogleUserDto res = GoogleUserDto.builder().userName(name).userEmail(email).imgURL(pictureUrl).birthday(new Date()).build();
+            SocialAccountUserInfo res = SocialAccountUserInfo.builder()
+                    .userName(name)
+                    .userEmail(email)
+                    .imgURL(pictureUrl)
+                    .build();
 
             log.info(res.toString());
 
             return res;
             //구글 유저 정보 파싱 - end
 
-        } catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Exception in getGoogleUserInfo : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_ERROR);
         }

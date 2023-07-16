@@ -15,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -81,10 +80,8 @@ public class Member extends BaseEntity implements UserDetails {
     }
 
     public Member update(String userName, String userEmail) throws ParseException {
-
         this.userId = userEmail;
         this.nickname = userName;
-
         return this;
     }
 

@@ -21,7 +21,7 @@ public class RegexUtil {
 
     public static boolean isValidPwFormat(String target) {
         // 영문 대소문자, 숫자 특수문자 최소 한 개씩 포함 9자 이상 500자 이하
-        String regex = "^(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$ %^&*-]).{9,500}$";
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{9,500}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(target);
 
