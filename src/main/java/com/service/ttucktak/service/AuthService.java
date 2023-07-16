@@ -100,8 +100,7 @@ public class AuthService {
 
             // 해당 계정 로그인 처리
             // access token과 refresh token 발급
-            // Todo: principal과 credentials에 어떤 값을 넣어줄지 고민해볼 것
-            TokensDto tokens = generateToken(member.getUserId(), member.getUserId());
+            TokensDto tokens = generateToken(userID, userPW);
 
             // 사용자의 refresh token 업데이트
             member.updateRefreshToken(tokens.getRefreshToken());
