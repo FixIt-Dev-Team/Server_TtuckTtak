@@ -24,6 +24,7 @@ public enum BaseErrorCode {
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "아이디나 비밀번호를 확인해주세요"),
     UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "userIdx 값에 오류 발생"),
+    NOTICE_REQ_ERROR(HttpStatus.BAD_REQUEST.value(), "현 설정과 동일한 값입니다."),
 
     /**
      * 401 : UNATHORIZED
