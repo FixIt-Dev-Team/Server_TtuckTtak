@@ -28,6 +28,8 @@ public class OAuthService {
     private String kakaoTokenKey;
     private String redirectUri = "https://ttukttak.store/api/auths/oauth2/kakao";
 
+    private final String defaultImageUrl = ""; // Todo: 뚝딱 서비스 default image url 설정
+
     /**
      * 카카오 토큰받기
      */
@@ -129,10 +131,26 @@ public class OAuthService {
                     .getAsJsonObject().get("profile")
                     .getAsJsonObject().get("nickname").getAsString();
 
+            String imgUrl;
+
+            // 프로필 이미지 권한이 있는 경우 해당 이미지를 사용하고
+            // 프로필 이미지 권한이 없는 경우 뚝딱 서비스 default image url로 설정한다.
+            boolean needProfileImageAgreement = object.get("kakao_account")
+                    .getAsJsonObject().get("profile_image_needs_agreement")
+                    .getAsBoolean();
+
+            if (needProfileImageAgreement) {
+                imgUrl = defaultImageUrl;
+            } else {
+                imgUrl = object.get("kakao_account")
+                        .getAsJsonObject().get("profile")
+                        .getAsJsonObject().get("profile_image_url").getAsString();
+            }
+
             SocialAccountUserInfo res = SocialAccountUserInfo.builder()
                     .userName(nickName)
                     .userEmail(email)
-                    .imgURL("Todo") // Todo: 프로필 이미지 받아오기
+                    .imgURL(imgUrl)
                     .build();
 
             log.info(res.toString());
@@ -159,7 +177,6 @@ public class OAuthService {
 
             // Get profile information from payload
             String email = payload.getEmail();
-            boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
             String name = (String) payload.get("name");
             String pictureUrl = (String) payload.get("picture");
 
