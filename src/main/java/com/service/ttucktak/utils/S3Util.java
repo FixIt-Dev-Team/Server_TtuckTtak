@@ -35,4 +35,18 @@ public class S3Util {
 
         return client.getUrl(bucket, filePath).toString();
     }
+
+    public enum Directory {
+        PROFILE("profile");
+
+        private final String dir;
+
+        Directory(String dir) {
+            this.dir = dir;
+        }
+
+        public String getDirectory() {
+            return this.dir;
+        }
+    }
 }
