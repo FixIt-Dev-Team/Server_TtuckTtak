@@ -1,4 +1,4 @@
-package com.service.ttucktak.dto.user;
+package com.service.ttucktak.dto.member;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

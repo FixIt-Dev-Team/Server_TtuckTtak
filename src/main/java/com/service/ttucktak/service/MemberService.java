@@ -2,10 +2,10 @@ package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
-import com.service.ttucktak.dto.user.PatchNicknameReqDto;
-import com.service.ttucktak.dto.user.PatchNicknameResDto;
-import com.service.ttucktak.dto.user.PatchNoticeReqDto;
-import com.service.ttucktak.dto.user.PatchNoticeResDto;
+import com.service.ttucktak.dto.member.PatchNicknameReqDto;
+import com.service.ttucktak.dto.member.PatchNicknameResDto;
+import com.service.ttucktak.dto.member.PatchNoticeReqDto;
+import com.service.ttucktak.dto.member.PatchNoticeResDto;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +42,6 @@ public class MemberService {
         //멤버 닉네임 변경
         target.get().updateMemberNickname(req.getNickname());
 
-        //변경한 엔티티 저장
-        try {
-            memberRepository.save(target.get());
-        }catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
         //리턴
         return new PatchNicknameResDto(target.get().getNickname());
     }
@@ -70,14 +62,6 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.NOTICE_REQ_ERROR);
         }
 
-        //바꿀 필요 있다면 트랜잭션 수행
-        try {
-            memberRepository.save(target.get());
-        }catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
         //리턴
         return new PatchNoticeResDto(target.get().isPushApprove());
     }
@@ -96,14 +80,6 @@ public class MemberService {
         //바꿀필요 없다면 트랜잭션 수행하지 않고 에러 던지기
         if(!needToChange){
             throw new BaseException(BaseErrorCode.NOTICE_REQ_ERROR);
-        }
-
-        //바꿀 필요 있다면 트랜잭션 수행
-        try {
-            memberRepository.save(target.get());
-        }catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
 
         //리턴
