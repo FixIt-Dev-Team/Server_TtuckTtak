@@ -4,10 +4,7 @@ import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseEntity;
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
@@ -24,6 +21,7 @@ import java.util.UUID;
 @Entity(name = "member")
 @Table(name = "member")
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity implements UserDetails {
 
@@ -93,6 +91,10 @@ public class Member extends BaseEntity implements UserDetails {
         }
 
         return this;
+    }
+
+    public void updateProfileImageUrl(String uploadedUrl) {
+        this.profileImgUrl = uploadedUrl;
     }
   
     public void updateRefreshToken(String refreshToken) {
