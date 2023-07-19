@@ -46,7 +46,10 @@ public class AuthController {
         return new BaseResponse<>(new BaseException(BaseErrorCode.AUTH_FAILED));
     }
 
-    @Operation(summary = "회원가입", description = "유저 회원 가입을 위한 API")
+    /**
+     * 회원가입
+     */
+    @Operation(summary = "회원가입", description = "서비스에 회원가입")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -90,9 +93,9 @@ public class AuthController {
     }
 
     /**
-     * 로그인 처리 API
+     * 로그인
      */
-    @Operation(summary = "로그인", description = "user id와 pw를 이용한 뚝딱 서비스 로그인")
+    @Operation(summary = "로그인", description = "사용자의 id와 pw를 이용해 서비스 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -111,7 +114,10 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "이메일 인증", description = "회원 가입시 유효한 이메일인지 확인")
+    /**
+     * 이메일 인증
+     */
+    @Operation(summary = "이메일 인증", description = "유효한 이메일 인지 인증 코드를 보내 확인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -130,9 +136,9 @@ public class AuthController {
     }
 
     /**
-     * 닉네임 사용 가능 여부 확인 API
+     * 닉네임 사용 가능 여부 확인
      */
-    @Operation(summary = "닉네임 사용 가능 여부 확인", description = "해당 닉네임이 사용 가능한지 확인")
+    @Operation(summary = "닉네임 사용 가능 여부 확인", description = "해당 닉네임이 현재 사용 가능한지 확인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
@@ -151,8 +157,13 @@ public class AuthController {
     }
 
     /**
-     * 카카오 회원정보 조회 및 로그인처리
+     * 카카오 계정을 통해 로그인
      */
+    @Operation(summary = "카카오 계정을 통해 로그인", description = "사용자의 카카오 인가 코드를 사용하여 서비스에 로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/oauth2/kakao")
     public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode) {
 
@@ -170,19 +181,17 @@ public class AuthController {
     }
 
     /**
-     * 구글 회원정보 조회 및 로그인 처리
+     * 구글 계정을 통해 서비스 로그인
      */
-    @Operation(summary = "회원가입", description = "유저 구글 회원 가입을 위한 API")
+    @Operation(summary = "구글 계정을 통해 로그인", description = "사용자의 구글 id token을 사용하여 서비스에 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패 오류발생.",
+            @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패. 오류 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 로그인 중 GoogleIDToken Payload 과정에서 오류발생 서버에 문의",
+            @ApiResponse(responseCode = "500", description = "구글 로그인 중 GoogleIDToken Payload 과정에서 오류 발생. 서버에 문의.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증중 구글 시큐리티 문제가 발생하였습니다.",
+            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증 중 구글 시큐리티 문제 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증중 IO 문제가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "유저가 존재하지 않습니다.",
+            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증 중 IO 문제 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
