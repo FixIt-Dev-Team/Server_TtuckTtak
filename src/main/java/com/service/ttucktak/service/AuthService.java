@@ -1,5 +1,6 @@
 package com.service.ttucktak.service;
 
+import com.service.ttucktak.File.FileService;
 import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
@@ -7,30 +8,31 @@ import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
+import com.service.ttucktak.utils.S3Util;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthService {
+    private final FileService fileService;
     private final MemberRepository memberRepository;
+    private final S3Util s3Util;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public AuthService(JwtUtil jwtUtil, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder, MemberRepository memberRepository) {
-        this.jwtUtil = jwtUtil;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.passwordEncoder = passwordEncoder;
-        this.memberRepository = memberRepository;
-    }
+    private static String defaultUrlImage = "default url";
 
     /**
      * 회원가입 - 뚝딱 서비스 회원가입
@@ -54,6 +56,7 @@ public class AuthService {
             data.setUserPw(encryptedPw);
 
             // DB에 저장
+            // Todo: default image url 설정 필요
             Member member = data.toEntity();
             memberRepository.save(member);
 
@@ -148,6 +151,20 @@ public class AuthService {
                                 .status(true)
                                 .build();
 
+                        // image url에 있는 이미지를 다운로드하고 해당 이미지를 S3에 업로드한다.
+                        // 업로드 링크를 셋팅한다
+                        // 이 과정에서 오류가 발생하면 default image url로 설정한다
+                        try {
+                            MultipartFile image = fileService.downloadFile(data.getImgURL(), "profile_image", "profile_image.png", "image/png");
+                            String uploadedUrl = s3Util.upload(image, PROFILE.getDirectory());
+                            newMember.updateProfileImageUrl(uploadedUrl);
+
+                        } catch (Exception e) {
+                            log.warn(e.getMessage());
+                            log.warn("유저(" + data.getUserName() + ")의 이미지 설정하는 과정에서 이상 발생");
+                            newMember.updateProfileImageUrl(defaultUrlImage);
+                        }
+
                         return memberRepository.save(newMember);
                     });
 
@@ -155,6 +172,8 @@ public class AuthService {
             // 토큰을 발급받고, refresh token을 DB에 저장한다.
             TokensDto token = generateToken(member.getUserId(), member.getUserId());
             member.updateRefreshToken(token.getRefreshToken());
+
+            log.info(member.toString());
 
             return new PostLoginRes(member.getMemberIdx().toString(), token);
 
