@@ -1,203 +1,185 @@
 package com.service.ttucktak.service;
 
+import com.service.ttucktak.File.FileService;
+import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.*;
-import com.service.ttucktak.entity.Profile;
-import com.service.ttucktak.entity.Users;
-import com.service.ttucktak.repository.ProfileRepository;
-import com.service.ttucktak.repository.UserRepository;
+import com.service.ttucktak.entity.Member;
+import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
+import com.service.ttucktak.utils.S3Util;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
-import java.util.UUID;
+import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
-    private final ProfileRepository profileRepository;
+    private final FileService fileService;
+    private final MemberRepository memberRepository;
+    private final S3Util s3Util;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public AuthService(UserRepository userRepository, ProfileRepository profileRepository, JwtUtil jwtUtil, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder){
-        this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
-        this.jwtUtil = jwtUtil;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private static String defaultUrlImage = "default url";
 
+    /**
+     * 회원가입 - 뚝딱 서비스 회원가입
+     */
     @Transactional(rollbackFor = BaseException.class)
-    public PostSignUpResDto createUsers(PostSignUpReqDto postSignUpReqDto) throws BaseException {
+    public PostSignUpResDto signUp(PostSignUpReqDto data) throws BaseException {
+        try {
+            // 동일한 아이디가 있는지 확인
+            // 이미 동일한 아이디가 존재하는 경우 already exist id exception
+            if (memberRepository.findByUserId(data.getUserId()).isPresent())
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_ID);
 
-        try{
-            postSignUpReqDto.setUserPW(passwordEncoder.encode(postSignUpReqDto.getUserPW()));
-            Users entity = postSignUpReqDto.toEntity(false);
+            // 동일한 닉네임 가지고 있는지 확인
+            // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
+            if (checkNicknameExists(data.getNickname()))
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
 
-            UUID userIdx = userRepository.save(entity).getUserIdx();
-            Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
-            insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-            Profile profile =
-                    Profile.builder()
-                            .usersIdx(insertedEntity.get())
-                            .iconType(0)
-                            .nickName(insertedEntity.get().getUserName())
-                            .build();
+            // 회원 가입 시작
+            // 비밀번호 암호화
+            String encryptedPw = passwordEncoder.encode(data.getUserPw());
+            data.setUserPw(encryptedPw);
 
-            profileRepository.save(profile);
+            // DB에 저장
+            // Todo: default image url 설정 필요
+            Member member = data.toEntity();
+            memberRepository.save(member);
 
-        }catch (Exception exception){
-            log.error(exception.getMessage());
+            return new PostSignUpResDto(true);
+
+        } catch (BaseException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
-
-        return new PostSignUpResDto(true);
     }
 
-    public TokensDto loginToken(String userID, String userPW) throws BaseException {
+    /**
+     * 이미 존재하는 닉네임인지 확인
+     */
+    public boolean checkNicknameExists(String nickname) throws BaseException {
+        try {
+            return memberRepository.existsMemberByNickname(nickname);
 
-        try{
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userID, userPW);
-
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-            return jwtUtil.createTokens(authentication);
-        }catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
-        }
-
-
-    }
-
-    public UUID loginUserIdx(String userID) throws BaseException {
-        Optional<UUID> userIdx = userRepository.findUserIdxByUserID(userID);
-        userIdx.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-
-        return userIdx.get();
-    }
-
-    public PostLoginRes kakaoOauth2(KakaoUserDto kakaoUserDto) throws BaseException {
-        boolean userExist = false;
-
-        try{
-            userExist = userRepository.existsUsersByUserID(kakaoUserDto.getUserEmail());
-        }catch (Exception exception){
-            log.error(exception.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
+    }
 
-        //유저 미 존재시 회원가입 후 로그인 처리
-        if(!userExist) {
-            try{
-                PostSignUpReqDto postSignUpReqDto =
-                        new PostSignUpReqDto(kakaoUserDto.getUserEmail(), passwordEncoder.encode(kakaoUserDto.getUserEmail()),
-                                kakaoUserDto.getUserName(), kakaoUserDto.getUserEmail(),
-                                kakaoUserDto.getBirthday(), 1);
+    /**
+     * 로그인 - 사용자 id와 pw를 통한 로그인
+     */
+    public PostLoginRes login(String userID, String userPW) throws BaseException {
+        try {
+            // user Id를 기반으로 회원이 있는지 조회
+            // 조회되는 유저가 없다면 login failed exception
+            Member member = memberRepository.findByUserId(userID)
+                    .orElseThrow(() -> new BaseException(BaseErrorCode.LOGIN_FAILED));
 
-                Users entity = postSignUpReqDto.toEntity(false);
+            // 조회된 유저와 비밀번호가 일치하는지 확인
+            // 비밀번호가 일치하지 않는 경우 login failed exception
+            if (!passwordEncoder.matches(userPW, member.getPassword()))
+                throw new BaseException(BaseErrorCode.LOGIN_FAILED);
 
-                UUID userIdx = userRepository.save(entity).getUserIdx();
-                Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
-                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-                Profile profile =
-                        Profile.builder()
-                                .usersIdx(insertedEntity.get())
-                                .iconType(0)
-                                .nickName(insertedEntity.get().getUserName())
+            // 해당 계정 로그인 처리
+            // access token과 refresh token 발급
+            TokensDto tokens = generateToken(userID, userPW);
+
+            // 사용자의 refresh token 업데이트
+            member.updateRefreshToken(tokens.getRefreshToken());
+
+            // 로그인 결과 반환 (userIdx, 토큰 반환)
+            String userIdx = member.getMemberIdx().toString();
+            return new PostLoginRes(userIdx, tokens);
+
+        } catch (BaseException e) {
+            e.getCause();
+            log.error(e.getMessage());
+            throw new BaseException(e.getErrorCode());
+        } catch (Exception e) {
+            e.getCause();
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 토큰 발행
+     */
+    public TokensDto generateToken(Object principal, Object credentials) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(principal, credentials);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        return jwtUtil.createTokens(authentication);
+    }
+
+    /**
+     * 로그인 - 소셜 계정
+     */
+    public PostLoginRes loginWithSocialAccount(SocialAccountUserInfo data, AccountType type) throws BaseException {
+        try {
+            // 이메일(user id)을 기반으로 사용자를 조회한다
+            // 만약 조회된 결과가 없으면 사용자를 생성하고 DB에 저장한다
+            Member member = memberRepository.findByUserId(data.getUserEmail())
+                    .orElseGet(() -> {
+                        Member newMember = Member.builder()
+                                .userId(data.getUserEmail())
+                                .userPw(passwordEncoder.encode(data.getUserEmail()))
+                                .nickname(data.getUserName()) // Todo: 동명이인 처리???
+                                .accountType(type)
+                                .adProvision(false)
+                                .profileImgUrl(data.getImgURL())
+                                .pushApprove(false)
+                                .nightApprove(false)
+                                .status(true)
                                 .build();
 
-                profileRepository.save(profile);
+                        // image url에 있는 이미지를 다운로드하고 해당 이미지를 S3에 업로드한다.
+                        // 업로드 링크를 셋팅한다
+                        // 이 과정에서 오류가 발생하면 default image url로 설정한다
+                        try {
+                            MultipartFile image = fileService.downloadFile(data.getImgURL(), "profile_image", "profile_image.png", "image/png");
+                            String uploadedUrl = s3Util.upload(image, PROFILE.getDirectory());
+                            newMember.updateProfileImageUrl(uploadedUrl);
 
-            }catch (Exception exception){
-                log.error(exception.getMessage());
-                throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-            }
-        }
+                        } catch (Exception e) {
+                            log.warn(e.getMessage());
+                            log.warn("유저(" + data.getUserName() + ")의 이미지 설정하는 과정에서 이상 발생");
+                            newMember.updateProfileImageUrl(defaultUrlImage);
+                        }
 
-        //로그인 처리
-        try{
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(kakaoUserDto.getUserEmail(), kakaoUserDto.getUserEmail());
+                        return memberRepository.save(newMember);
+                    });
 
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            // --- 로그인 처리 ---
+            // 토큰을 발급받고, refresh token을 DB에 저장한다.
+            TokensDto token = generateToken(member.getUserId(), member.getUserId());
+            member.updateRefreshToken(token.getRefreshToken());
 
-            TokensDto token = jwtUtil.createTokens(authentication);
+            log.info(member.toString());
 
-            UUID userIdx = loginUserIdx(kakaoUserDto.getUserEmail());
+            return new PostLoginRes(member.getMemberIdx().toString(), token);
 
-            return new PostLoginRes(userIdx.toString(), token);
-        }
-        catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
-        }
-    }
-
-    public PostLoginRes googleOauth2(GoogleUserDto googleUserDto) throws BaseException {
-        boolean userExist = false;
-
-        try{
-            userExist = userRepository.existsUsersByUserID(googleUserDto.getUserEmail());
-        }catch (Exception exception){
-            log.error(exception.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
-        //유저 미 존재시 회원가입 후 로그인 처리
-        if(!userExist) {
-            try{
-                PostSignUpReqDto postSignUpReqDto =
-                        new PostSignUpReqDto(googleUserDto.getUserEmail(), passwordEncoder.encode(googleUserDto.getUserEmail()),
-                                googleUserDto.getUserName(), googleUserDto.getUserEmail(),
-                                googleUserDto.getBirthday(), 1);
-
-                Users entity = postSignUpReqDto.toEntity(false);
-
-                UUID userIdx = userRepository.save(entity).getUserIdx();
-                Optional<Users> insertedEntity = userRepository.findByUserIdx(userIdx);
-                insertedEntity.orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
-                Profile profile =
-                        Profile.builder()
-                                .usersIdx(insertedEntity.get())
-                                .iconType(0)
-                                .nickName(insertedEntity.get().getUserName())
-                                .build();
-
-                profileRepository.save(profile);
-
-            }catch (Exception exception){
-                log.error(exception.getMessage());
-                throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-            }
-        }
-
-        //로그인 처리
-        try{
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(googleUserDto.getUserEmail(), googleUserDto.getUserEmail());
-
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-            TokensDto token = jwtUtil.createTokens(authentication);
-
-            UUID userIdx = loginUserIdx(googleUserDto.getUserEmail());
-
-            return new PostLoginRes(userIdx.toString(), token);
-        }
-        catch (Exception exception){
-            log.error(exception.getMessage());
-            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
         }
     }
 }

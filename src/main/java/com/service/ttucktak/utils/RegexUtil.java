@@ -11,8 +11,26 @@ import java.util.regex.Pattern;
 @Service
 public class RegexUtil {
 
-    public static boolean isValidEmail(String target) {
+    public static boolean isValidEmailFormat(String target) {
         String regex = "^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_.]+\\.[a-zA-Z0-9+-_.]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(target);
+
+        return matcher.matches();
+    }
+
+    public static boolean isValidPwFormat(String target) {
+        // 영문 대소문자, 숫자 특수문자 최소 한 개씩 포함 9자 이상 500자 이하
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{9,500}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(target);
+
+        return matcher.matches();
+    }
+
+    public static boolean isValidNicknameFormat(String target) {
+        // 4글자 이상, 12글자 미만
+        String regex = ".{4,11}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(target);
 

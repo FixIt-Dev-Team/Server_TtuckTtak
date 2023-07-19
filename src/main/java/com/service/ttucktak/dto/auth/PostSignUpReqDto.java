@@ -1,11 +1,9 @@
 package com.service.ttucktak.dto.auth;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.service.ttucktak.base.Role;
-import com.service.ttucktak.entity.Users;
+import com.service.ttucktak.base.AccountType;
+import com.service.ttucktak.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -15,32 +13,28 @@ import java.util.Date;
 @Getter
 @Setter
 public class PostSignUpReqDto {
-    @Schema(name = "userID", example = "example@example.com", requiredProperties = "true", description = "유저 아이디(이메일)")
-    private String userID;
-    @Schema(name = "userPW", example = "12345678", requiredProperties = "true", description = "비밀번호(8자 이상 20자 미만)")
-    private String userPW;
-    @Schema(name = "userName", example = "userName", requiredProperties = "true", description = "유저 닉네임(2자 이상 10자 미만)")
-    private String userName;
-    @Schema(name = "email", example = "example@example.com", requiredProperties = "true", description = "유저 이메일")
-    private String email;
+    @Schema(name = "userId", example = "ttukttak@ttukttak.com", requiredProperties = "true", description = "유저 아이디(이메일)")
+    private String userId;
+    @Schema(name = "userPw", example = "asdfASDF1!", requiredProperties = "true", description = "비밀번호(영문 대소문자, 숫자 특수문자 최소 한 개씩 포함 9자 이상 500자 이하)")
+    private String userPw;
+    @Schema(name = "nickname", example = "ttukttak", requiredProperties = "true", description = "유저 닉네임(4글자 이상 12글자 미만)")
+    private String nickname;
+    @Schema(name = "adProvision", example = "true", requiredProperties = "true", description = "서비스 홍보 약관")
+    private boolean adProvision;
 
-    @Schema(name = "birthday", example = "1998-11-14", requiredProperties = "true", description = "유저 생년월일")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date birthday;
-    @Schema(name = "accountType", example = "0", requiredProperties = "true", description = "계정 타입(자체:0 카카오: 1, 구글: 2")
-    private int accountType;
-
-    public Users toEntity(boolean validation){
-        return Users.builder()
-                .userID(userID)
-                .userPW(userPW)
-                .userName(userName)
-                .email(email)
-                .birthday(birthday)
-                .validation(validation)
-                .accountType(accountType)
-                .role(Role.ROLE_USER)
+    public Member toEntity() {
+        return Member.builder()
+                .userId(userId)
+                .userPw(userPw)
+                .nickname(nickname)
+                .accountType(AccountType.DEFAULT)
+                .adProvision(adProvision)
+                .profileImgUrl("default url")
+                .updatedAt(new Date())
+                .pushApprove(true)
+                .refreshToken("default token")
+                .nightApprove(true)
+                .status(true)
                 .build();
     }
 }

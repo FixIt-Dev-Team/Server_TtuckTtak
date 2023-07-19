@@ -2,8 +2,8 @@ package com.service.ttucktak.config;
 
 import com.service.ttucktak.dto.auth.OAuthAttribute;
 import com.service.ttucktak.dto.auth.SessionUser;
-import com.service.ttucktak.entity.Users;
-import com.service.ttucktak.repository.UserRepository;
+import com.service.ttucktak.entity.Member;
+import com.service.ttucktak.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,8 @@ import java.text.ParseException;
 @Lazy
 public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final UserRepository userRepository;
     private final HttpSession httpSession;
+    private final MemberRepository memberRepository;
 
     //OAuth Request 해서 가져온 유저 정보 로딩
     @Override
@@ -48,21 +48,21 @@ public class CustomOAuthUserService implements OAuth2UserService<OAuth2UserReque
 
         OAuthAttribute attribute = OAuthAttribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        Users users = saveOrUpdate(attribute);
+        Member users = saveOrUpdate(attribute);
 
         httpSession.setAttribute("user", new SessionUser(users));
 
         return oAuth2User;
     }
 
-    private Users saveOrUpdate(OAuthAttribute attribute){
-        Users users = null;
+    private Member saveOrUpdate(OAuthAttribute attribute){
+        Member users = null;
         
         try{
-            users = userRepository.findByEmail(attribute.getUserEmail())
+            users = memberRepository.findByUserId(attribute.getUserEmail())
                     .map(entity -> {
                         try {
-                            return entity.update(attribute.getUserName(), attribute.getUserEmail(), attribute.getBirthday());
+                            return entity.update(attribute.getUserName(), attribute.getUserEmail());
                         } catch (ParseException e) {
                             throw new RuntimeException(e.getMessage());
                         }

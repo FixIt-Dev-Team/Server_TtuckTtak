@@ -74,6 +74,12 @@ dependencies {
 
     //GoogleAPI
     implementation 'com.google.api-client:google-api-client:1.33.0'
+
+    //Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 jar {

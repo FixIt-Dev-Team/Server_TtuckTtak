@@ -4,7 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,6 +21,7 @@ import java.util.Date;
 @Getter
 @Setter
 @MappedSuperclass
+@NoArgsConstructor
 public class BaseEntity {
 
     @Column(name = "createdAt", nullable = false, updatable = false)// 기본값 지정
@@ -33,4 +36,11 @@ public class BaseEntity {
 
     @Column(name = "status", nullable = false)
     private Boolean status = true; // Row 유효 상태
+
+
+    public BaseEntity(Date createdAt, Date updatedAt, Boolean status) {
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.status = status;
+    }
 }
