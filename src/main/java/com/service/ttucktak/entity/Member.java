@@ -104,6 +104,22 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
+    public void updateMemberNickname(String target){
+        this.nickname = target;
+    }
+
+    public boolean updatePushApprove(boolean target){
+        if(target == this.pushApprove) return false;
+        this.pushApprove = target;
+        return true;
+    }
+
+    public boolean updateNightApprove(boolean target) {
+        if(target == this.pushApprove) return false;
+        this.nightApprove = target;
+        return true;
+    }
+
     public UUID getMemberIdx() {
         return memberIdx;
     }
@@ -144,6 +160,9 @@ public class Member extends BaseEntity implements UserDetails {
         return refreshToken;
     }
 
+    /**
+     * UserDetail 구현 메서드
+     * */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

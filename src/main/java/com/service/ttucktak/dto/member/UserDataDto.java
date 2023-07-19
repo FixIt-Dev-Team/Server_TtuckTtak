@@ -1,7 +1,6 @@
-package com.service.ttucktak.dto.user;
+package com.service.ttucktak.dto.member;
 
 import com.service.ttucktak.base.AccountType;
-import com.service.ttucktak.base.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.service.ttucktak.dto.user;
+package com.service.ttucktak.dto.member;
 
 import com.service.ttucktak.base.Role;
 import lombok.Builder;

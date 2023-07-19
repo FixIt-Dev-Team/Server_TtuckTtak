@@ -5,7 +5,7 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
-import com.service.ttucktak.dto.user.UserDataDto;
+import com.service.ttucktak.dto.member.UserDataDto;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.Optional;
 import java.util.UUID;
 
