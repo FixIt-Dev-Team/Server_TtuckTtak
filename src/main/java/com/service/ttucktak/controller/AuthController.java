@@ -145,8 +145,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Database Error",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("nickname/{nickname}")
-    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@PathVariable String nickname) {
+    @GetMapping("nickname")
+    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@RequestParam("nickname") String nickname) {
         try {
             boolean isAvailable = !authService.checkNicknameExists(nickname);
             GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
