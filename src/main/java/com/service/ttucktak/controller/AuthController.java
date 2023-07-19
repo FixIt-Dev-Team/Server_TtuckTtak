@@ -20,14 +20,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auths")
 @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "요청에 성공하였습니다.")})
 @Slf4j
+@RequiredArgsConstructor
 @Tag(name = "회원 인증 API")
 public class AuthController {
     private final JwtUtil jwtUtil;
@@ -39,15 +40,6 @@ public class AuthController {
     private final OAuthService oAuthService;
 
     private final EmailService emailService;
-
-    @Autowired
-    public AuthController(JwtUtil jwtUtil, GoogleJwtUtil googleJwtUtil, AuthService authService, OAuthService oAuthService, EmailService emailService) {
-        this.jwtUtil = jwtUtil;
-        this.googleJwtUtil = googleJwtUtil;
-        this.authService = authService;
-        this.oAuthService = oAuthService;
-        this.emailService = emailService;
-    }
 
     @GetMapping("/exception")
     public BaseResponse<BaseException> accessExceptionHandler() {
@@ -158,14 +150,6 @@ public class AuthController {
         }
     }
 
-//    /**
-//     * 카카오 태스트
-//     * */
-//    @GetMapping("oauth2/kakao/test")
-//    public String kakaoTest(@RequestParam("code") String code){
-//        return code;
-//    }
-
     /**
      * 카카오 회원정보 조회 및 로그인처리
      */
@@ -204,23 +188,18 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/oauth2/google")
-    public BaseResponse<PostLoginRes> GoogleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString) {
+    public BaseResponse<PostLoginRes> googleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString) {
 
         try {
             GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
 
-            SocialAccountUserInfo data;
-
-            if (idToken != null) {
-
-                data = oAuthService.getGoogleUserInfo(idToken);
-
-            } else {
+            if (idToken == null)
                 throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_EXPIRE);
-            }
+
+            SocialAccountUserInfo data = oAuthService.getGoogleUserInfo(idToken);
 
             return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.GOOGLE));
-            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
+
         } catch (BaseException exception) {
             log.error(exception.getMessage());
             return new BaseResponse<>(exception);
