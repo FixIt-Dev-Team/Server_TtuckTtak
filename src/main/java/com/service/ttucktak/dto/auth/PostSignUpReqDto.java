@@ -29,10 +29,10 @@ public class PostSignUpReqDto {
                 .nickname(nickname)
                 .accountType(AccountType.DEFAULT)
                 .adProvision(adProvision)
-                .profileImgUrl("default url")
-                .updatedAt(new Date())
+                .profileImgUrl("default url") // Todo: default image url 설정 필요
+                .updatedAt(new Date()) // createdAt, updatedAt 자동 설정. 삭제
                 .pushApprove(true)
-                .refreshToken("default token")
+                .refreshToken(null)
                 .nightApprove(true)
                 .status(true)
                 .build();
