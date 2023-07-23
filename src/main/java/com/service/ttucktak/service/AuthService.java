@@ -79,6 +79,7 @@ public class AuthService {
     /**
      * 사용 가능한 닉네임인지 확인
      */
+    @Transactional(readOnly = true)
     public boolean nicknameAvailable(String nickname) throws BaseException {
         try {
             // 닉네임 형식 validation
