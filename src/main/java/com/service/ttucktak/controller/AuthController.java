@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/auths")
 @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "요청에 성공하였습니다.")})
@@ -116,6 +118,33 @@ public class AuthController {
             log.error(e.getMessage());
             return new BaseResponse<>(e);
         }
+    }
+
+    @Operation(summary = "엑세스 토큰 비활성(서비스 내부 로그아웃)", description = "사용자의 서비스 로그아웃 처리")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/logout")
+    public BaseResponse<PostLogoutRes> userLogout(@RequestBody PostLogoutReq req) {
+
+        UUID userIdx;
+
+        try{
+            userIdx = UUID.fromString(req.getUserIdx());
+            return new BaseResponse<>(authService.logout(userIdx));
+
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return new BaseResponse<>(e);
+        } catch (Exception e){
+            e.getCause();
+            log.error(e.getMessage());
+            return new BaseResponse<>(new BaseException(BaseErrorCode.UUID_ERROR));
+        }
+
     }
 
     /**

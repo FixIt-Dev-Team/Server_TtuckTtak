@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 
 @Service
@@ -166,6 +168,36 @@ public class AuthService {
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
+    }
+
+    /**
+     * 로그인 - 사용자 id와 pw를 통한 로그인
+     */
+
+    public PostLogoutRes logout(UUID userIdx) throws BaseException {
+
+        try {
+            Member member = memberRepository.findByMemberIdx(userIdx)
+                    .orElseThrow(()->new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+            member.updateRefreshToken(null);
+
+            return new PostLogoutRes(true);
+
+        } catch (BaseException e){
+
+            e.getCause();
+            log.error(e.getMessage());
+            throw new BaseException(e.getErrorCode());
+
+        } catch (Exception e){
+
+            e.getCause();
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+
+        }
+
     }
 
     /**
