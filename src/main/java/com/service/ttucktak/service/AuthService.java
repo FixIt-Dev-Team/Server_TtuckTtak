@@ -47,24 +47,17 @@ public class AuthService {
             if (memberRepository.findByUserId(data.getUserId()).isPresent())
                 throw new BaseException(BaseErrorCode.ALREADY_EXIST_ID);
 
-            /// 닉네임 비속어 처리
-            // 비속어가 포함되어 있는 경우 invalid nickname exception
-            String nickname = data.getNickname();
-            if (profanityFilterService.containsProfanity(nickname))
-                throw new BaseException(BaseErrorCode.INVALID_NICKNAME);
-
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            if (memberRepository.existsMemberByNickname(nickname))
+            if (memberRepository.existsMemberByNickname(data.getNickname()))
                 throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
 
             // 회원 가입 시작
-            // 비밀번호 암호화
-            String encryptedPw = passwordEncoder.encode(data.getUserPw());
-            data.setUserPw(encryptedPw);
+            // 비밀번호 암호화 및 DB에 저장
+            Member member = memberRepository.save(data.toEntity());
+            member.updateCriticalSection(passwordEncoder.encode(data.getUserPw()));
 
-            // DB에 저장
-            return memberRepository.save(data.toEntity());
+            return member;
 
         } catch (BaseException e) {
             log.error(e.getErrorCode().getMessage());

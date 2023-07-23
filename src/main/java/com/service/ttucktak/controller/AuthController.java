@@ -14,16 +14,21 @@ import com.service.ttucktak.utils.JwtUtil;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
-import com.service.ttucktak.utils.RegexUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auths")
@@ -43,9 +48,24 @@ public class AuthController {
     private final EmailService emailService;
 
     /**
-     * 회원가입
+     * exception handler - method argument not valid exception
      */
-    @Operation(summary = "회원가입", description = "서비스에 회원가입")
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public BaseResponse<BaseException> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        // 유효하지 않은 값들의 오류를 모아 로그로 출력 하고 반환한다
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        log.error(message);
+
+        return new BaseResponse<>(false, HttpStatus.BAD_REQUEST.value(), message, null);
+    }
+
+    /**
+     * 회원가입 + 로그인 처리
+     */
+    @Operation(summary = "회원가입", description = "서비스에 회원가입 및 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -59,29 +79,11 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
-    public BaseResponse<PostLoginRes> signUp(@RequestBody PostSignUpReqDto data) {
+    public BaseResponse<PostLoginRes> signUp(@RequestBody @Valid PostSignUpReqDto data) {
         try {
-            // 이메일 형식 validation
-            // 앱을 통해 회원가입 할 때는 이메일 인증은 사전에 한 상태
-            // API를 통해 입력받을 때 이메일 인증은 못 하더라도 최소한 이메일 형태로 받을 수 있게 이메일 형식만 체크
-            // 이메일 형식에 맞지 않는 경우 invalid email exception
-            String email = data.getUserId();
-            if (!RegexUtil.isValidEmailFormat(email)) throw new BaseException(BaseErrorCode.INVALID_EMAIL_FORMAT);
-
-            // 비밀번호 형식 validation
-            // 비밀번호 형식에 맞지 않는 경우 invalid pw format exception
-            String pw = data.getUserPw();
-            if (!RegexUtil.isValidPwFormat(pw)) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
-
-            // 닉네임 형식 validation
-            // 닉네임 형식에 맞지 않는 경우 invalid nickname format exception
-            String nickname = data.getNickname();
-            if (!RegexUtil.isValidNicknameFormat(nickname))
-                throw new BaseException(BaseErrorCode.INVALID_NICKNAME_FORMAT);
-
             // 회원가입한 사용자의 정보를 기반으로 로그인 처리
             Member newMember = authService.signUp(data);
-            PostLoginRes result = authService.login(newMember, pw);
+            PostLoginRes result = authService.login(newMember, data.getUserPw());
 
             return new BaseResponse<>(result);
 
