@@ -5,6 +5,7 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
+import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.service.EmailService;
@@ -63,7 +64,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
-    public BaseResponse<PostSignUpResDto> signUp(@RequestBody PostSignUpReqDto data) {
+    public BaseResponse<PostLoginRes> signUp(@RequestBody PostSignUpReqDto data) {
         try {
             // 이메일 형식 validation
             // 앱을 통해 회원가입 할 때는 이메일 인증은 사전에 한 상태
@@ -83,7 +84,10 @@ public class AuthController {
             if (!RegexUtil.isValidNicknameFormat(nickname))
                 throw new BaseException(BaseErrorCode.INVALID_NICKNAME_FORMAT);
 
-            PostSignUpResDto result = authService.signUp(data);
+            // 회원가입한 사용자의 정보를 기반으로 로그인 처리
+            Member newMember = authService.signUp(data);
+            PostLoginRes result = authService.login(newMember, pw);
+
             return new BaseResponse<>(result);
 
         } catch (BaseException e) {

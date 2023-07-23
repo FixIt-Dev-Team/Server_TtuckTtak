@@ -38,7 +38,7 @@ public class AuthService {
      * 회원가입 - 뚝딱 서비스 회원가입
      */
     @Transactional(rollbackFor = BaseException.class)
-    public PostSignUpResDto signUp(PostSignUpReqDto data) throws BaseException {
+    public Member signUp(PostSignUpReqDto data) throws BaseException {
         try {
             // 동일한 아이디가 있는지 확인
             // 이미 동일한 아이디가 존재하는 경우 already exist id exception
@@ -56,11 +56,7 @@ public class AuthService {
             data.setUserPw(encryptedPw);
 
             // DB에 저장
-            // Todo: default image url 설정 필요
-            Member member = data.toEntity();
-            memberRepository.save(member);
-
-            return new PostSignUpResDto(true);
+            return memberRepository.save(data.toEntity());
 
         } catch (BaseException e) {
             log.error(e.getMessage());
@@ -79,6 +75,29 @@ public class AuthService {
             return memberRepository.existsMemberByNickname(nickname);
 
         } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 로그인 - 사용자 객체를 통한 로그인 (해당 메소드는 회원 가입할 때만 사용해 사용자의 정보를 확인하는 절차가 없음)
+     */
+    public PostLoginRes login(Member member, String userPW) throws BaseException {
+        try {
+            // 해당 계정 로그인 처리
+            // access token과 refresh token 발급
+            TokensDto tokens = generateToken(member.getUserId(), userPW);
+
+            // 사용자의 refresh token 업데이트
+            member.updateRefreshToken(tokens.getRefreshToken());
+
+            // 로그인 결과 반환 (userIdx, 토큰 반환)
+            String userIdx = member.getMemberIdx().toString();
+            return new PostLoginRes(userIdx, tokens);
+
+        } catch (Exception e) {
+            e.getCause();
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
