@@ -30,7 +30,6 @@ public class PostSignUpReqDto {
                 .accountType(AccountType.DEFAULT)
                 .adProvision(adProvision)
                 .profileImgUrl("default url") // Todo: default image url 설정 필요
-                .updatedAt(new Date()) // createdAt, updatedAt 자동 설정. 삭제
                 .pushApprove(true)
                 .refreshToken(null)
                 .nightApprove(true)
