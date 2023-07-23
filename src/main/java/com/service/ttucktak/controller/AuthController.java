@@ -42,11 +42,6 @@ public class AuthController {
 
     private final EmailService emailService;
 
-    @GetMapping("/exception")
-    public BaseResponse<BaseException> accessExceptionHandler() {
-        return new BaseResponse<>(new BaseException(BaseErrorCode.AUTH_FAILED));
-    }
-
     /**
      * 회원가입
      */
