@@ -125,6 +125,8 @@ public class MemberController {
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
+        if (!RegexUtil.isValidPwFormat(reqDto.getNewPw())) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
+
         return new BaseResponse<>(memberService.updateUserPasswordByUUID(userIdx,reqDto));
 
     }
