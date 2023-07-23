@@ -8,6 +8,7 @@ import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
 import com.service.ttucktak.repository.MemberRepository;
 import com.service.ttucktak.utils.JwtUtil;
+import com.service.ttucktak.utils.RegexUtil;
 import com.service.ttucktak.utils.S3Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 @RequiredArgsConstructor
 public class AuthService {
     private final FileService fileService;
+    private final ProfanityFilterService profanityFilterService;
     private final MemberRepository memberRepository;
     private final S3Util s3Util;
     private final JwtUtil jwtUtil;
@@ -45,9 +47,15 @@ public class AuthService {
             if (memberRepository.findByUserId(data.getUserId()).isPresent())
                 throw new BaseException(BaseErrorCode.ALREADY_EXIST_ID);
 
+            /// 닉네임 비속어 처리
+            // 비속어가 포함되어 있는 경우 invalid nickname exception
+            String nickname = data.getNickname();
+            if (profanityFilterService.containsProfanity(nickname))
+                throw new BaseException(BaseErrorCode.INVALID_NICKNAME);
+
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            if (checkNicknameExists(data.getNickname()))
+            if (memberRepository.existsMemberByNickname(nickname))
                 throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
 
             // 회원 가입 시작
@@ -59,8 +67,9 @@ public class AuthService {
             return memberRepository.save(data.toEntity());
 
         } catch (BaseException e) {
-            log.error(e.getMessage());
+            log.error(e.getErrorCode().getMessage());
             throw e;
+
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
@@ -68,11 +77,30 @@ public class AuthService {
     }
 
     /**
-     * 이미 존재하는 닉네임인지 확인
+     * 사용 가능한 닉네임인지 확인
      */
-    public boolean checkNicknameExists(String nickname) throws BaseException {
+    public boolean nicknameAvailable(String nickname) throws BaseException {
         try {
-            return memberRepository.existsMemberByNickname(nickname);
+            // 닉네임 형식 validation
+            // 닉네임 형식에 맞지 않는 경우 invalid nickname format exception
+            if (!RegexUtil.isValidNicknameFormat(nickname))
+                throw new BaseException(BaseErrorCode.INVALID_NICKNAME_FORMAT);
+
+            // 닉네임 비속어 처리
+            // 비속어가 포함되어 있는 경우 invalid nickname exception
+            if (profanityFilterService.containsProfanity(nickname))
+                throw new BaseException(BaseErrorCode.INVALID_NICKNAME);
+
+            // 동일한 닉네임 가지고 있는지 확인
+            // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
+            if (memberRepository.existsMemberByNickname(nickname))
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+
+            return true;
+
+        } catch (BaseException e) {
+            log.warn(e.getErrorCode().getMessage());
+            return false;
 
         } catch (Exception e) {
             log.error(e.getMessage());

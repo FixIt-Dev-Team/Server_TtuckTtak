@@ -17,6 +17,7 @@ public enum BaseErrorCode {
     PW_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "비밀번호가 너무 깁니다."),
     INVALID_PW_FORMAT(HttpStatus.BAD_REQUEST.value(), "비밀번호 형식에 맞지 않습니다."),
     INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST.value(), "닉네임 형식에 맞지 않습니다."),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 닉네임입니다."),
     ID_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 짧습니다."),
     ID_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 깁니다."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 이메일입니다."),

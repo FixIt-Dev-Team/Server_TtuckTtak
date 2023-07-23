@@ -150,7 +150,7 @@ public class AuthController {
     @GetMapping("nickname")
     public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@RequestParam("nickname") String nickname) {
         try {
-            boolean isAvailable = !authService.checkNicknameExists(nickname);
+            boolean isAvailable = authService.nicknameAvailable(nickname);
             GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
             return new BaseResponse<>(result);
 
