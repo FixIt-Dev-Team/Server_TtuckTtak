@@ -113,14 +113,14 @@ public class AuthController {
 
         UUID userIdx;
 
-        try{
+        try {
             userIdx = UUID.fromString(req.getUserIdx());
             return new BaseResponse<>(authService.logout(userIdx));
 
         } catch (BaseException e) {
             e.printStackTrace();
             return new BaseResponse<>(e);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.getCause();
             log.error(e.getMessage());
             return new BaseResponse<>(new BaseException(BaseErrorCode.UUID_ERROR));
@@ -139,9 +139,7 @@ public class AuthController {
     @PostMapping("/email-confirm")
     public BaseResponse<PostEmailConfirmResDto> emailConfirm(@Email @RequestParam String to) {
         try {
-            String ePw = emailService.sendSimpleMessage(to);
-            PostEmailConfirmResDto result = new PostEmailConfirmResDto(ePw);
-            return new BaseResponse<>(result);
+            return new BaseResponse<>(emailService.sendSimpleMessage(to));
 
         } catch (BaseException e) {
             e.printStackTrace();
@@ -160,9 +158,7 @@ public class AuthController {
     @GetMapping("nickname")
     public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@Nickname @RequestParam("nickname") String nickname) {
         try {
-            boolean isAvailable = authService.nicknameAvailable(nickname);
-            GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
-            return new BaseResponse<>(result);
+            return new BaseResponse<>(authService.nicknameAvailable(nickname));
 
         } catch (BaseException e) {
             log.error(e.getMessage());

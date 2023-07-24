@@ -73,18 +73,18 @@ public class AuthService {
      * 사용 가능한 닉네임인지 확인
      */
     @Transactional(readOnly = true)
-    public boolean nicknameAvailable(String nickname) throws BaseException {
+    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
         try {
             // 동일한 닉네임 가지고 있는지 확인
             // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
             if (memberRepository.existsMemberByNickname(nickname))
                 throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
 
-            return true;
+            return new GetNicknameAvailableResDto(true);
 
         } catch (BaseException e) {
             log.warn(e.getErrorCode().getMessage());
-            return false;
+            return new GetNicknameAvailableResDto(false);
 
         } catch (Exception e) {
             log.error(e.getMessage());
