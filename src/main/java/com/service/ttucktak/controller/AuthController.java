@@ -6,6 +6,7 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
+import com.service.ttucktak.entity.annotation.Nickname;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.service.EmailService;
@@ -20,16 +21,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.executable.ValidateOnExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/api/auths")
 @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "요청에 성공하였습니다.")})
@@ -46,6 +52,21 @@ public class AuthController {
     private final OAuthService oAuthService;
 
     private final EmailService emailService;
+
+    /**
+     * exception handler - constraint violation exception
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public BaseResponse<BaseException> handleConstraintViolationException(ConstraintViolationException e) {
+        // 유효하지 않은 값들의 오류를 모아 로그로 출력 하고 반환한다
+        String message = e.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
+        log.error(message);
+
+        return new BaseResponse<>(false, HttpStatus.BAD_REQUEST.value(), message, null);
+    }
 
     /**
      * exception handler - method argument not valid exception
@@ -145,7 +166,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("nickname")
-    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@RequestParam("nickname") String nickname) {
+    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@Nickname @RequestParam("nickname") String nickname) {
         try {
             boolean isAvailable = authService.nicknameAvailable(nickname);
             GetNicknameAvailableResDto result = new GetNicknameAvailableResDto(isAvailable);
