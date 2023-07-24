@@ -126,23 +126,6 @@ public class Member extends BaseEntity implements UserDetails {
         return memberIdx;
     }
 
-    // getter 사용으로 코드 불필요 -> 삭제
-//    public String getUserId() {
-//        return userId;
-//    }
-
-//    public String getNickname() {
-//        return nickname;
-//    }
-
-//    public AccountType getAccountType() {
-//        return accountType;
-//    }
-
-//    public String getProfileImgUrl() {
-//        return profileImgUrl;
-//    }
-
     public boolean isPushApprove() {
         return pushApprove;
     }

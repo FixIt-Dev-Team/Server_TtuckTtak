@@ -21,21 +21,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.executable.ValidateOnExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -54,36 +47,6 @@ public class AuthController {
     private final OAuthService oAuthService;
 
     private final EmailService emailService;
-
-    /**
-     * exception handler - constraint violation exception
-     */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public BaseResponse<BaseException> handleConstraintViolationException(ConstraintViolationException e) {
-        // 유효하지 않은 값들의 오류를 모아 로그로 출력 하고 반환한다
-        String message = e.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining(", "));
-
-        log.error(message);
-
-        return new BaseResponse<>(false, HttpStatus.BAD_REQUEST.value(), message, null);
-    }
-
-    /**
-     * exception handler - method argument not valid exception
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public BaseResponse<BaseException> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        // 유효하지 않은 값들의 오류를 모아 로그로 출력 하고 반환한다
-        String message = e.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-
-        log.error(message);
-
-        return new BaseResponse<>(false, HttpStatus.BAD_REQUEST.value(), message, null);
-    }
 
     /**
      * 회원가입 + 로그인 처리
