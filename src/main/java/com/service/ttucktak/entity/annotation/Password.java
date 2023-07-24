@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
-    String message() default "유효하지 않은 비밀번호: 9자 이상 500자 이하이며, 최소한 한 개의 대소문자, 숫자, 특수문자를 포함해야 합니다.";
+    String message() default "올바른 형식의 비밀번호여야 합니다";
 
     Class<?>[] groups() default {};
 

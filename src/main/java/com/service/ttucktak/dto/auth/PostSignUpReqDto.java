@@ -15,7 +15,7 @@ import lombok.*;
 @Setter
 public class PostSignUpReqDto {
     @Schema(name = "userId", example = "ttukttak@ttukttak.com", requiredProperties = "true", description = "유저 아이디(이메일)")
-    @Email(message = "이메일 형식에 맞지 않습니다")
+    @Email
     private String userId;
     @Password
     @Schema(name = "userPw", example = "asdfASDF1!", requiredProperties = "true", description = "비밀번호(영문 대소문자, 숫자 특수문자 최소 한 개씩 포함 9자 이상 500자 이하)")
