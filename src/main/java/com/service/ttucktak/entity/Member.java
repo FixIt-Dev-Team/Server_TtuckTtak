@@ -101,7 +101,7 @@ public class Member extends BaseEntity implements UserDetails {
         this.refreshToken = refreshToken;
     }
 
-    public Member updateCriticalSection(String new_password_enc) throws ParseException {
+    public Member updatePassword(String new_password_enc) throws ParseException {
         this.userPw = new_password_enc;
         return this;
     }

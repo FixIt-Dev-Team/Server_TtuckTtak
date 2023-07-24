@@ -26,7 +26,7 @@ public class PostSignUpReqDto {
     @Schema(name = "adProvision", example = "true", requiredProperties = "true", description = "서비스 홍보 약관")
     private boolean adProvision;
 
-    public Member toEntity() {
+    public Member toMember() {
         return Member.builder()
                 .userId(userId)
                 .userPw(userPw)

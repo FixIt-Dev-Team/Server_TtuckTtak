@@ -54,8 +54,8 @@ public class AuthService {
 
             // 회원 가입 시작
             // 비밀번호 암호화 및 DB에 저장
-            Member member = memberRepository.save(data.toEntity());
-            member.updateCriticalSection(passwordEncoder.encode(data.getUserPw()));
+            Member member = memberRepository.save(data.toMember());
+            member.updatePassword(passwordEncoder.encode(data.getUserPw()));
 
             return member;
 
