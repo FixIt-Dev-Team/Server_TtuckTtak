@@ -38,6 +38,9 @@ public class GoogleJwtUtil {
         } catch (IOException e) {
             log.error("Google ID token verification IOException error (GoogleJwtUtil)",e);
             throw new BaseException(BaseErrorCode.GOOGLE_IOEXCEPTION);
+        } catch (Exception e) {
+            log.error("Google ID Token Unknown error",e);
+            throw new BaseException(BaseErrorCode.GOOGLE_UNHANDELEDEXCEPTION);
         }
 
         return idToken;

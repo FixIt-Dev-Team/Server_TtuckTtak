@@ -55,7 +55,8 @@ public enum BaseErrorCode {
     GOOGLE_GENERALSECURITY_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 구글 시큐리티 문제가 발생하였습니다."),
     MEMBER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다."),
     PWUPDATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "패스워드 업데이트 처리중 예상치 못한 에러가 발생하였습니다."),
-    GOOGLE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 IO 문제가 발생하였습니다.");
+    GOOGLE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 IO 문제가 발생하였습니다."),
+    GOOGLE_UNHANDELEDEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 JWT 토큰 인증중 내부 문제가 발생하였습니다.");
 
 
     private final Integer status;
