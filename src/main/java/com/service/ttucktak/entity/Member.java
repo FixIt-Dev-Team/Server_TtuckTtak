@@ -117,7 +117,7 @@ public class Member extends BaseEntity implements UserDetails {
     }
 
     public boolean updateNightApprove(boolean target) {
-        if(target == this.pushApprove) return false;
+        if(target == this.nightApprove) return false;
         this.nightApprove = target;
         return true;
     }
