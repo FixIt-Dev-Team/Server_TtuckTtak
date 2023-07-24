@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.executable.ValidateOnExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -145,7 +146,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/email-confirm")
-    public BaseResponse<PostEmailConfirmResDto> emailConfirm(@RequestParam String to) {
+    public BaseResponse<PostEmailConfirmResDto> emailConfirm(@Email @RequestParam String to) {
         try {
             String ePw = emailService.sendSimpleMessage(to);
             PostEmailConfirmResDto result = new PostEmailConfirmResDto(ePw);
