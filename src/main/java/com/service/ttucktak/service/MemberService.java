@@ -115,7 +115,7 @@ public class MemberService {
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
         try{
-            currentUser.update(dto);
+            currentUser.updateUserProfile(dto);
         }catch (Exception exception){
             log.error("Member update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
@@ -140,7 +140,7 @@ public class MemberService {
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
         try{
-            currentUser.updateCriticalSection(passwordEncoder.encode(dto.getNewPw()));
+            currentUser.updatePassword(passwordEncoder.encode(dto.getNewPw()));
         }catch (Exception exception){
             log.error("Member PW update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);

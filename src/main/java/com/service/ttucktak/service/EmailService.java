@@ -1,7 +1,8 @@
 package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseException;
+import com.service.ttucktak.dto.auth.PostEmailConfirmResDto;
 
 public interface EmailService {
-    String sendSimpleMessage(String to) throws BaseException;
+    PostEmailConfirmResDto sendSimpleMessage(String to) throws BaseException;
 }

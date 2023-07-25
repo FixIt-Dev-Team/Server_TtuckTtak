@@ -54,8 +54,8 @@ public class AuthService {
 
             // 회원 가입 시작
             // 비밀번호 암호화 및 DB에 저장
-            Member member = memberRepository.save(data.toEntity());
-            member.updateCriticalSection(passwordEncoder.encode(data.getUserPw()));
+            Member member = memberRepository.save(data.toMember());
+            member.updatePassword(passwordEncoder.encode(data.getUserPw()));
 
             return member;
 
@@ -73,18 +73,11 @@ public class AuthService {
      * 사용 가능한 닉네임인지 확인
      */
     @Transactional(readOnly = true)
-    public boolean nicknameAvailable(String nickname) throws BaseException {
+    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
         try {
             // 동일한 닉네임 가지고 있는지 확인
-            // 이미 동일한 닉네임을 가지고 있는 경우 already exist nickname exception
-            if (memberRepository.existsMemberByNickname(nickname))
-                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
-
-            return true;
-
-        } catch (BaseException e) {
-            log.warn(e.getErrorCode().getMessage());
-            return false;
+            // 이미 동일한 닉네임을 가지고 있는 경우 사용 불가, 없는 경우는 사용 가능
+            return new GetNicknameAvailableResDto(!memberRepository.existsMemberByNickname(nickname));
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -145,6 +138,7 @@ public class AuthService {
             e.getCause();
             log.error(e.getMessage());
             throw new BaseException(e.getErrorCode());
+
         } catch (Exception e) {
             e.getCause();
             log.error(e.getMessage());
@@ -153,33 +147,28 @@ public class AuthService {
     }
 
     /**
-     * 로그인 - 사용자 id와 pw를 통한 로그인
+     * 로그아웃
      */
-
     public PostLogoutRes logout(UUID userIdx) throws BaseException {
 
         try {
             Member member = memberRepository.findByMemberIdx(userIdx)
-                    .orElseThrow(()->new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+                    .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
             member.updateRefreshToken(null);
 
             return new PostLogoutRes(true);
 
-        } catch (BaseException e){
-
+        } catch (BaseException e) {
             e.getCause();
             log.error(e.getMessage());
             throw new BaseException(e.getErrorCode());
 
-        } catch (Exception e){
-
+        } catch (Exception e) {
             e.getCause();
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-
         }
-
     }
 
     /**

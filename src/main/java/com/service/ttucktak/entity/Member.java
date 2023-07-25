@@ -83,88 +83,56 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
-    public Member update(PostUserDataReqDto dto) throws ParseException {
-
+    public void updateUserProfile(PostUserDataReqDto dto) {
         this.nickname = dto.getNickName();
-        if(dto.getImgUpdate() != null){
+        if (dto.getImgUpdate() != null) {
             this.profileImgUrl = dto.getImgUpdate();
         }
-
-        return this;
     }
 
     public void updateProfileImageUrl(String uploadedUrl) {
         this.profileImgUrl = uploadedUrl;
     }
-  
+
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
-    public Member updateCriticalSection(String new_password_enc) throws ParseException {
-        this.userPw = new_password_enc;
-        return this;
+    public void updatePassword(String newPasswordEnc) {
+        this.userPw = newPasswordEnc;
     }
 
-    public void updateMemberNickname(String target){
+    public void updateMemberNickname(String target) {
         this.nickname = target;
     }
 
-    public boolean updatePushApprove(boolean target){
-        if(target == this.pushApprove) return false;
-        this.pushApprove = target;
-        return true;
+    public boolean updatePushApprove(boolean target) {
+        if (target != this.pushApprove) {
+            this.pushApprove = target;
+            return true;
+        }
+        return false;
     }
 
     public boolean updateNightApprove(boolean target) {
-        if(target == this.pushApprove) return false;
-        this.nightApprove = target;
-        return true;
+        if (target != this.nightApprove) {
+            this.nightApprove = target;
+            return true;
+        }
+        return false;
     }
 
     public UUID getMemberIdx() {
         return memberIdx;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUserPw() {
-        return userPw;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public AccountType getAccountType() {
-        return accountType;
-    }
-
-    public String getProfileImgUrl() {
-        return profileImgUrl;
-    }
-
-    public boolean isAdProvision() {
-        return adProvision;
-    }
-
     public boolean isPushApprove() {
         return pushApprove;
     }
 
-    public boolean isNightApprove() {
-        return nightApprove;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
     /**
      * UserDetail 구현 메서드
-     * */
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
