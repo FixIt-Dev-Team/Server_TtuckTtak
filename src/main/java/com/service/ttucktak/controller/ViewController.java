@@ -4,11 +4,11 @@ import com.service.ttucktak.File.FileService;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
-import com.service.ttucktak.config.security.CustomUserDetailService;
+import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
-import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
 import com.service.ttucktak.dto.member.UserDataDto;
+import com.service.ttucktak.service.MemberService;
 import com.service.ttucktak.utils.S3Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,15 +30,15 @@ import java.util.UUID;
 @Tag(name = "View API")
 public class ViewController {
 
-    private CustomUserDetailService userDetailService;
+    private MemberService memberService;
 
     private FileService fileService;
 
     private S3Util s3Util;
 
     @Autowired
-    public ViewController(CustomUserDetailService userDetailService, FileService fileService, S3Util s3Util){
-        this.userDetailService = userDetailService;
+    public ViewController(MemberService memberService, FileService fileService, S3Util s3Util){
+        this.memberService = memberService;
         this.fileService = fileService;
         this.s3Util = s3Util;
     }
@@ -48,7 +48,7 @@ public class ViewController {
         소올직히 지금 유저 히스토리 DB 준비가 안되서 좀 기다려야 것음.
     }*/
 
-    @Operation(summary = "VIEW API", description = "설정 view 유저정보 조회 API")
+    @Operation(summary = "Setting VIEW API", description = "Setting View 유저정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -56,7 +56,7 @@ public class ViewController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/setting")
-    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx) throws BaseException{
+    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
         UUID userId;
 
@@ -67,11 +67,11 @@ public class ViewController {
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(userDetailService.loadUserByUUID(userId));
+        return new BaseResponse<>(memberService.loadUserByUUID(userId));
 
     }
 
-    @Operation(summary = "VIEW API", description = "설정 view 유저 정보 업데이트 API")
+    @Operation(summary = "Setting VIEW Update API", description = "Setting View 유저 정보 업데이트 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -86,7 +86,8 @@ public class ViewController {
     })
     @PatchMapping("/setting/update")
     public BaseResponse<PostUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") PostUserDataReqDto reqDto,
-                                                           @RequestPart(value = "files", required = false) MultipartFile file) throws BaseException{
+                                                           @RequestPart(value = "files", required = false) MultipartFile file,
+                                                           @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
         if(file != null){
 
@@ -115,34 +116,7 @@ public class ViewController {
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(userDetailService.updateUserByUUID(userIdx,reqDto));
-
-    }
-
-    @Operation(summary = "VIEW API", description = "설정 view 유저 비밀번호 변경 API")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database result NotFound",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "패스워드 업데이트 처리중 예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PatchMapping("/setting/update/password")
-    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto) throws BaseException{
-
-        UUID userIdx;
-
-        try{
-            userIdx = UUID.fromString(reqDto.getUserIdx());
-        }catch(Exception exception){
-            log.error("UUID 변환중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.UUID_ERROR);
-        }
-
-        return new BaseResponse<>(userDetailService.updateUserPasswordByUUID(userIdx,reqDto));
+        return new BaseResponse<>(memberService.updateUserByUUID(userIdx,reqDto));
 
     }
 

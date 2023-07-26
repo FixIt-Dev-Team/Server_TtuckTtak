@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+import com.service.ttucktak.dto.auth.PostEmailConfirmResDto;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -72,12 +73,12 @@ public class EmailServiceImpl implements EmailService {
 
     // 이메일을 발송하는 메서드
     @Override
-    public String sendSimpleMessage(String to) throws BaseException {
+    public PostEmailConfirmResDto sendSimpleMessage(String to) throws BaseException {
         try {
             MimeMessage message = createMessage(to);
 
             emailSender.send(message);
-            return ePw;
+            return new PostEmailConfirmResDto(ePw);
 
         } catch (Exception e) {
             log.error(e.getMessage());
