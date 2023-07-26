@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class LevelDescription extends BaseEntity {
     private String description;
 
     @Builder
-    public LevelDescription(Date createdAt, Date updatedAt, Boolean status, UUID descIdx, SolutionEntry entryIdx, Integer level, String description) {
+    public LevelDescription(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID descIdx, SolutionEntry entryIdx, Integer level, String description) {
         super(createdAt, updatedAt, status);
         this.descIdx = descIdx;
         this.entryIdx = entryIdx;
