@@ -4,6 +4,7 @@ import com.service.ttucktak.File.FileService;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
+import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.member.UserDataDto;
@@ -47,7 +48,7 @@ public class ViewController {
         소올직히 지금 유저 히스토리 DB 준비가 안되서 좀 기다려야 것음.
     }*/
 
-    @Operation(summary = "VIEW API", description = "설정 view 유저정보 조회 API")
+    @Operation(summary = "Setting VIEW API", description = "Setting View 유저정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -55,7 +56,7 @@ public class ViewController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/setting")
-    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx) throws BaseException{
+    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
         UUID userId;
 
@@ -70,7 +71,7 @@ public class ViewController {
 
     }
 
-    @Operation(summary = "VIEW API", description = "설정 view 유저 정보 업데이트 API")
+    @Operation(summary = "Setting VIEW Update API", description = "Setting View 유저 정보 업데이트 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -85,7 +86,8 @@ public class ViewController {
     })
     @PatchMapping("/setting/update")
     public BaseResponse<PostUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") PostUserDataReqDto reqDto,
-                                                           @RequestPart(value = "files", required = false) MultipartFile file) throws BaseException{
+                                                           @RequestPart(value = "files", required = false) MultipartFile file,
+                                                           @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
         if(file != null){
 
