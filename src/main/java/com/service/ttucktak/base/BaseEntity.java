@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -24,21 +25,19 @@ import java.util.Date;
 @NoArgsConstructor
 public class BaseEntity {
 
-    @Column(name = "createdAt", nullable = false, updatable = false)// 기본값 지정
+    @Column(name = "created_at", nullable = false, updatable = false)// 기본값 지정
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt; // Row 생성 시점
+    private LocalDateTime createdAt; // Row 생성 시점
 
-    @Column(name = "updatedAt", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt; // Row 업데이트 시점
+    private LocalDateTime updatedAt; // Row 업데이트 시점
 
     @Column(name = "status", nullable = false)
     private Boolean status = true; // Row 유효 상태
 
 
-    public BaseEntity(Date createdAt, Date updatedAt, Boolean status) {
+    public BaseEntity(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status) {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.status = status;

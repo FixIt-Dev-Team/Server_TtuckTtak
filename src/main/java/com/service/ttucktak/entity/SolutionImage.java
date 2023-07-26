@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class SolutionImage extends BaseEntity {
     private String imageUrl;
 
     @Builder
-    public SolutionImage(Date createdAt, Date updatedAt, Boolean status, UUID solutionImageIdx, SolutionDetail detailIdx, String imageUrl) {
+    public SolutionImage(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID solutionImageIdx, SolutionDetail detailIdx, String imageUrl) {
         super(createdAt, updatedAt, status);
         SolutionImageIdx = solutionImageIdx;
         this.detailIdx = detailIdx;

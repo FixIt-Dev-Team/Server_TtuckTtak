@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @DynamicInsert
@@ -23,17 +24,25 @@ public class SolutionEntry extends BaseEntity {
     @Column(name = "entry_idx")
     private Long entryIdx;
 
+    @Column(name = "survey_idx", nullable = false)
+    private Long surveyIdx;
+
     @Column(name = "res_pattern", nullable = false)
     private Long resPattern;
 
     @Column(name = "issue_type", nullable = false)
     private Long issueType;
 
+    @Column(name = "problem_name", nullable = false)
+    private String problemName;
+
     @Builder
-    public SolutionEntry(Date createdAt, Date updatedAt, Boolean status, Long entryIdx, Long resPattern, Long issueType) {
+    public SolutionEntry(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, Long entryIdx, Long surveyIdx, Long resPattern, Long issueType, String problemName) {
         super(createdAt, updatedAt, status);
         this.entryIdx = entryIdx;
+        this.surveyIdx = surveyIdx;
         this.resPattern = resPattern;
         this.issueType = issueType;
+        this.problemName = problemName;
     }
 }
