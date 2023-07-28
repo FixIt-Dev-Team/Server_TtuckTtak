@@ -37,6 +37,8 @@ public enum BaseErrorCode {
      */
     KAKAO_EMAIL_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "카카오 이메일 동의가 필요합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "유저가 존재하지 않습니다."),
+    SOLUTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "솔루션이 존재하지 않습니다."),
+    SOLUTION_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "솔루션이 존재하지 않습니다."),
 
     /**
      * 409 : Conflict
