@@ -44,6 +44,8 @@ public class IgnoreSecurityConfig {
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger-ui/index.html").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/page/leafs/**").permitAll()
+                .requestMatchers("/api/members/password/**").permitAll()
                 .anyRequest().permitAll();
 
         return http.build();

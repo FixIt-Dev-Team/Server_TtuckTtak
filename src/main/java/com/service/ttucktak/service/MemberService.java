@@ -155,4 +155,25 @@ public class MemberService {
         return new PostUserDataResDto(true);
 
     }
+
+    public Boolean updateUserPasswordByEmail(PutPasswordUpdateDto dto) throws BaseException {
+        Optional<Member> res = memberRepository.findByUserId(dto.getEmail());
+
+        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        try{
+            currentUser.updatePassword(passwordEncoder.encode(dto.getNewPw()));
+        }catch (Exception exception){
+            log.error("Member PW update중 문제 발생 : " + exception.getMessage());
+            throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
+        }
+        try{
+            memberRepository.save(currentUser);
+        }catch (Exception exception){
+            log.error("Member database update중 문제 발생 : " + exception.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
+
+        return true;
+    }
 }

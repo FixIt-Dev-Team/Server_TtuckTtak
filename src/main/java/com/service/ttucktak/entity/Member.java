@@ -32,7 +32,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(name = "member_idx", nullable = false)
     private UUID memberIdx;
 
-    @Column(name = "user_id", length = 45, nullable = false)
+    @Column(name = "user_id", length = 45, nullable = false, unique = true)
     private String userId;
 
     @Column(name = "user_pw", length = 500, nullable = false)
