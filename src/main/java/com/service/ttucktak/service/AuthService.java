@@ -26,6 +26,7 @@ import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
     private final FileService fileService;
     private final MemberRepository memberRepository;
