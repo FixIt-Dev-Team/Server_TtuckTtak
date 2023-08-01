@@ -2,7 +2,10 @@ package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+
 import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
+import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
+
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
@@ -13,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +26,7 @@ import java.util.UUID;
  * */
 @Service
 @Slf4j
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 
@@ -34,6 +39,22 @@ public class MemberService {
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * 사용 가능한 닉네임인지 확인
+     */
+    @Transactional(readOnly = true)
+    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
+        try {
+            // 동일한 닉네임 가지고 있는지 확인
+            // 이미 동일한 닉네임을 가지고 있는 경우 사용 불가, 없는 경우는 사용 가능
+            return new GetNicknameAvailableResDto(!memberRepository.existsMemberByNickname(nickname));
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
     }
 
     /**
