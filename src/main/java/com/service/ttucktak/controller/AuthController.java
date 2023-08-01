@@ -59,6 +59,8 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "400", description = "닉네임 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디입니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
@@ -101,7 +103,7 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "엑세스 토큰 비활성(서비스 내부 로그아웃)", description = "사용자의 서비스 로그아웃 처리")
+    @Operation(summary = "리프레쉬 토큰 비활성 (서비스 내부 로그아웃)", description = "사용자의 계정 로그아웃 처리")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
@@ -110,11 +112,8 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public BaseResponse<PostLogoutRes> userLogout(@RequestBody PostLogoutReq req) {
-
-        UUID userIdx;
-
         try {
-            userIdx = UUID.fromString(req.getUserIdx());
+            UUID userIdx = UUID.fromString(req.getUserIdx());
             return new BaseResponse<>(authService.logout(userIdx));
 
         } catch (BaseException e) {
