@@ -39,9 +39,9 @@ public class SolutionController {
      * */
     @Operation(summary = "솔루션 엔트리 조회", description = "현 상황 및 설문에 따른 해결법 엔트리 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "현 설정과 동일한 값입니다.",
+            @ApiResponse(responseCode = "404", description = "솔루션이 존재하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/entry")
@@ -59,9 +59,11 @@ public class SolutionController {
      * */
     @Operation(summary = "솔루션 디테일 조회", description = "해결 방법 상세 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "현 설정과 동일한 값입니다.",
+            @ApiResponse(responseCode = "400", description = "Idx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "404", description = "솔루션 상세정보가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/detail")
@@ -79,9 +81,11 @@ public class SolutionController {
      * */
     @Operation(summary = "솔루션 엔트리 조회(IDX)", description = "바이패스를 통한 해결법 엔트리 조회 ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "현 설정과 동일한 값입니다.",
+            @ApiResponse(responseCode = "400", description = "Idx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "404", description = "솔루션이 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/entryIdx")

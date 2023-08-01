@@ -86,7 +86,7 @@ public class SolutionService {
         List<SolutionPossibleDto> solutionPossibleDtos = new ArrayList<SolutionPossibleDto>();
 
         if(solutionPossibles.isEmpty()){
-            throw new BaseException(BaseErrorCode.SOLUTION_NOT_FOUND);
+            solutionPossibleDtos = null;
         }else{
             for (SolutionPossible solutionPossible : solutionPossibles){
                 solutionPossibleDtos.add(SolutionPossibleDto.builder()
@@ -128,7 +128,15 @@ public class SolutionService {
 
     public SolutionDetailResDto loadDetail(SolutionDetailReqDto req) throws BaseException {
 
-        Optional<SolutionDetail> solDetail = solutionDetailRepository.findBySolutionIdx_SolutionIdx(UUID.fromString(req.getSolutionIdx()));
+        UUID solIdx;
+
+        try{
+            solIdx = UUID.fromString(req.getSolutionIdx());
+        }catch (Exception e){
+            throw new BaseException(BaseErrorCode.UUID_ERROR);
+        }
+
+        Optional<SolutionDetail> solDetail = solutionDetailRepository.findBySolutionIdx_SolutionIdx(solIdx);
 
         solDetail.orElseThrow(()->new BaseException(BaseErrorCode.SOLUTION_DETAIL_NOT_FOUND));
 
