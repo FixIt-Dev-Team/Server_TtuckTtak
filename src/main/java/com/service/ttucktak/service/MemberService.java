@@ -23,6 +23,7 @@ import java.util.UUID;
  * */
 @Service
 @Slf4j
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 
