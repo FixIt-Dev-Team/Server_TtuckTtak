@@ -139,7 +139,6 @@ public class MemberController {
      * 타임리프 비밀번호 변경 페이지 이메일 전송 API
      * */
     //TODO Validation 처리와 스웨거 붙이기
-//    @Operation(summary = "비밀번호 찾기 이메일 전송", description = "비밀번호 찾기 기능을 위한 이메일 전송 API")
     @GetMapping("/password/email")
     public BaseResponse<Boolean> passwordPage(Model model, @RequestParam("target-email") String to) throws BaseException{
         try{
