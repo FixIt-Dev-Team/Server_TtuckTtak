@@ -3,7 +3,6 @@ package com.service.ttucktak.controller;
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
-import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
@@ -27,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+import static com.service.ttucktak.config.security.CustomHttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @Tag(name = "Member API")
@@ -76,7 +77,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/nickname")
-    public BaseResponse<PatchNicknameResDto> patchNickname(@RequestBody PatchNicknameReqDto req, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) {
+    public BaseResponse<PatchNicknameResDto> patchNickname(@RequestBody PatchNicknameReqDto req, @RequestHeader(AUTHORIZATION) String jwt) {
         try {
             return new BaseResponse<>(memberService.patchNickname(req));
 
@@ -96,7 +97,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/push")
-    public BaseResponse<PatchNoticeResDto> patchPushNotice(@RequestBody PatchNoticeReqDto req, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) {
+    public BaseResponse<PatchNoticeResDto> patchPushNotice(@RequestBody PatchNoticeReqDto req, @RequestHeader(AUTHORIZATION) String jwt) {
         try {
             return new BaseResponse<>(memberService.patchPushNotice(req));
 
@@ -116,7 +117,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/push/night")
-    public BaseResponse<PatchNoticeResDto> patchNightNotice(@RequestBody PatchNoticeReqDto req, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) {
+    public BaseResponse<PatchNoticeResDto> patchNightNotice(@RequestBody PatchNoticeReqDto req, @RequestHeader(AUTHORIZATION) String jwt) {
         try {
             return new BaseResponse<>(memberService.patchNightNotice(req));
 
@@ -140,17 +141,16 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/password")
-    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
-        UUID userIdx;
+    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto, @RequestHeader(AUTHORIZATION) String jwt) throws BaseException {
+        try {
+            UUID userIdx = UUID.fromString(reqDto.getUserIdx());
+            return new BaseResponse<>(memberService.updateUserPasswordByUUID(userIdx, reqDto));
 
-        try{
-            userIdx = UUID.fromString(reqDto.getUserIdx());
-        }catch(Exception exception){
+        } catch (BaseException e) {
+            return new BaseResponse<>(e);
+
+        } catch (Exception exception) {
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
-
-        if (!RegexUtil.isValidPwFormat(reqDto.getNewPw())) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
-
-        return new BaseResponse<>(memberService.updateUserPasswordByUUID(userIdx, reqDto));
     }
 }

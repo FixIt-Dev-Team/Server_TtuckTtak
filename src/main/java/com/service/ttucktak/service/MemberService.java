@@ -15,12 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * 유저 서비스단 클래스
- * */
+ */
 @Service
 @Slf4j
 public class MemberService {
@@ -30,7 +29,7 @@ public class MemberService {
 
     /**
      * 생성자 의존성 주입 - Constructor Dependency Injection
-     * */
+     */
     @Autowired
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
@@ -55,94 +54,83 @@ public class MemberService {
 
     /**
      * 닉네임 변경 API - Service
-     * */
-    public PatchNicknameResDto patchNickname(PatchNicknameReqDto req) throws BaseException{
+     */
+    public PatchNicknameResDto patchNickname(PatchNicknameReqDto req) throws BaseException {
         //변경 대상 멤버 가져오기
-        Optional<Member> target = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()));
-        target.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
+        Member member = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()))
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
 
         //멤버 닉네임 변경
-        target.get().updateMemberNickname(req.getNickname());
+        member.updateMemberNickname(req.getNickname());
 
         //리턴
-        return new PatchNicknameResDto(target.get().getNickname());
+        return new PatchNicknameResDto(member.getNickname());
     }
 
     /**
      * 사용자 정보 로드 API
-     * */
+     */
     public UserDataDto loadUserByUUID(UUID userIdx) throws BaseException {
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+        Member currentUser = memberRepository.findByMemberIdx(userIdx)
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
-        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
-
-        UserDataDto user = UserDataDto.builder()
-                .userName(currentUser.getUsername())
-                .email(currentUser.getUserId())
-                .profileImgUrl(currentUser.getProfileImgUrl())
-                .accountType(currentUser.getAccountType())
-                .build();
-
-        return user;
+        return new UserDataDto(currentUser);
     }
 
     /**
      * Push 알람 설정 API - Service
-     * */
+     */
     public PatchNoticeResDto patchPushNotice(PatchNoticeReqDto req) throws BaseException {
         //변경 대상 멤버 가져오기
-        Optional<Member> target = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()));
-        target.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
+        Member member = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()))
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
 
         //멤버 알림 설정 허용여부 변경 (같을 경우 바꾸지 않고 바꿀 필요 없다는 플레그 세우기)
-        boolean needToChange = target.get().updatePushApprove(req.isTargetStatus());
+        boolean needToChange = member.updatePushApprove(req.isTargetStatus());
 
         //바꿀필요 없다면 트랜잭션 수행하지 않고 에러 던지기
-        if(!needToChange){
+        if (!needToChange) {
             throw new BaseException(BaseErrorCode.NOTICE_REQ_ERROR);
         }
 
         //리턴
-        return new PatchNoticeResDto(target.get().isPushApprove());
+        return new PatchNoticeResDto(member.isPushApprove());
     }
 
     /**
      * 야간 알람 설정 API - Service
-     * */
+     */
     public PatchNoticeResDto patchNightNotice(PatchNoticeReqDto req) throws BaseException {
         //변경 대상 멤버 가져오기
-        Optional<Member> target = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()));
-        target.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
+        Member member = memberRepository.findByMemberIdx(UUID.fromString(req.getMemberIdx()))
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_ERROR));
 
         //멤버 야간 알림 설정 허용여부 변경 (같을 경우 바꾸지 않고 바꿀 필요 없다는 플레그 세우기)
-        boolean needToChange = target.get().updateNightApprove(req.isTargetStatus());
+        boolean needToChange = member.updateNightApprove(req.isTargetStatus());
 
         //바꿀필요 없다면 트랜잭션 수행하지 않고 에러 던지기
-        if(!needToChange){
+        if (!needToChange) {
             throw new BaseException(BaseErrorCode.NOTICE_REQ_ERROR);
         }
 
         //리턴
-        return new PatchNoticeResDto(target.get().isPushApprove());
+        return new PatchNoticeResDto(member.isPushApprove());
     }
 
     public PostUserDataResDto updateUserByUUID(UUID userIdx, PostUserDataReqDto dto) throws BaseException {
+        Member currentUser = memberRepository.findByMemberIdx(userIdx)
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
-
-        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
-
-        try{
+        try {
             currentUser.updateUserProfile(dto);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Member update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
 
-
-        try{
+        try {
             memberRepository.save(currentUser);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Member database update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
@@ -152,25 +140,23 @@ public class MemberService {
     }
 
     public PostUserDataResDto updateUserPasswordByUUID(UUID userIdx, PutPasswordUpdateDto dto) throws BaseException {
+        Member currentUser = memberRepository.findByMemberIdx(userIdx)
+                .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
-
-        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
-
-        try{
+        try {
             currentUser.updatePassword(passwordEncoder.encode(dto.getNewPw()));
-        }catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Member PW update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
         }
-        try{
+
+        try {
             memberRepository.save(currentUser);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             log.error("Member database update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
 
         return new PostUserDataResDto(true);
-
     }
 }

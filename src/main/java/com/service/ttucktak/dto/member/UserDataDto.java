@@ -1,8 +1,8 @@
 package com.service.ttucktak.dto.member;
 
 import com.service.ttucktak.base.AccountType;
+import com.service.ttucktak.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,11 +20,10 @@ public class UserDataDto {
     @Schema(name = "accountType", example = "test_type", requiredProperties = "true", description = "유저 타")
     private AccountType accountType;
 
-    @Builder
-    public UserDataDto(String userName, String email, String birthday, String profileImgUrl, AccountType accountType){
-        this.userName = userName;
-        this.email = email;
-        this.profileImgUrl = profileImgUrl;
-        this.accountType = accountType;
+    public UserDataDto(Member member) {
+        this.userName = member.getUsername();
+        this.email = member.getUserId();
+        this.profileImgUrl = member.getProfileImgUrl();
+        this.accountType = member.getAccountType();
     }
 }
