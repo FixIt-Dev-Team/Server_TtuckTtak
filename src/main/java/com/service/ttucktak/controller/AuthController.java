@@ -6,7 +6,6 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.dto.auth.*;
 import com.service.ttucktak.entity.Member;
-import com.service.ttucktak.entity.annotation.Nickname;
 import com.service.ttucktak.oAuth.OAuthService;
 import com.service.ttucktak.service.AuthService;
 import com.service.ttucktak.service.EmailService;
@@ -142,25 +141,6 @@ public class AuthController {
 
         } catch (BaseException e) {
             e.printStackTrace();
-            return new BaseResponse<>(e);
-        }
-    }
-
-    /**
-     * 닉네임 사용 가능 여부 확인
-     */
-    @Operation(summary = "닉네임 사용 가능 여부 확인", description = "해당 닉네임이 현재 사용 가능한지 확인")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @GetMapping("nickname")
-    public BaseResponse<GetNicknameAvailableResDto> checkNicknameAvailability(@Nickname @RequestParam("nickname") String nickname) {
-        try {
-            return new BaseResponse<>(authService.nicknameAvailable(nickname));
-
-        } catch (BaseException e) {
-            log.error(e.getMessage());
             return new BaseResponse<>(e);
         }
     }

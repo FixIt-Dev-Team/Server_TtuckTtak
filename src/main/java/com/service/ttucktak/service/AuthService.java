@@ -70,22 +70,6 @@ public class AuthService {
     }
 
     /**
-     * 사용 가능한 닉네임인지 확인
-     */
-    @Transactional(readOnly = true)
-    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
-        try {
-            // 동일한 닉네임 가지고 있는지 확인
-            // 이미 동일한 닉네임을 가지고 있는 경우 사용 불가, 없는 경우는 사용 가능
-            return new GetNicknameAvailableResDto(!memberRepository.existsMemberByNickname(nickname));
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-    }
-
-    /**
      * 로그인 - 사용자 객체를 통한 로그인 (해당 메소드는 회원 가입할 때만 사용해 사용자의 정보를 확인하는 절차가 없음)
      */
     public PostLoginRes login(Member member, String userPW) throws BaseException {
