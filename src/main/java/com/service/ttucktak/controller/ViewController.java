@@ -11,6 +11,7 @@ import com.service.ttucktak.dto.member.UserDataDto;
 import com.service.ttucktak.service.MemberService;
 import com.service.ttucktak.utils.S3Util;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,18 +58,18 @@ public class ViewController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/setting")
-    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+    public BaseResponse<UserDataDto> settingView(@RequestParam("memberIdx") String memberIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
-        UUID userId;
+        UUID memberId;
 
         try{
-            userId = UUID.fromString(userIdx);
+            memberId = UUID.fromString(memberIdx);
         }catch(Exception exception){
             log.error("UUID 변환중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(memberService.loadUserByUUID(userId));
+        return new BaseResponse<>(memberService.loadUserByUUID(memberId));
 
     }
 
@@ -84,9 +86,10 @@ public class ViewController {
             @ApiResponse(responseCode = "500", description = "멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @PatchMapping("/setting/update")
-    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") PostUserDataReqDto reqDto,
-                                                           @RequestPart(value = "files", required = false) MultipartFile file,
+    //Multipart form data임을 보여주어야 해서 어노테이션에 속성 추가
+    @PatchMapping(value = "/setting/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") @Parameter(description = "Try It Out 클릭하시면 데이터가 나와요") PostUserDataReqDto reqDto,
+                                                           @RequestPart(value = "file", required = false) @Parameter(description = "프로필 이미지") MultipartFile file,
                                                            @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
         if(file != null){
@@ -107,16 +110,16 @@ public class ViewController {
             // 차후 이미지 DB 준비 마무리 되면 그때 추가 작업.
         }
 
-        UUID userIdx;
+        UUID memberIdx;
 
         try{
-            userIdx = UUID.fromString(reqDto.getUserIdx());
+            memberIdx = UUID.fromString(reqDto.getMemberIdx());
         }catch(Exception exception){
             log.error("UUID 변환중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(memberService.updateUserByUUID(userIdx,reqDto));
+        return new BaseResponse<>(memberService.updateUserByUUID(memberIdx,reqDto));
 
     }
 

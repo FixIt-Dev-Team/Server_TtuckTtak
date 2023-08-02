@@ -2,6 +2,10 @@ package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+
+import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
+import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
+
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
@@ -12,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +26,7 @@ import java.util.UUID;
  * */
 @Service
 @Slf4j
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 
@@ -33,6 +39,22 @@ public class MemberService {
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * 사용 가능한 닉네임인지 확인
+     */
+    @Transactional(readOnly = true)
+    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
+        try {
+            // 동일한 닉네임 가지고 있는지 확인
+            // 이미 동일한 닉네임을 가지고 있는 경우 사용 불가, 없는 경우는 사용 가능
+            return new GetNicknameAvailableResDto(!memberRepository.existsMemberByNickname(nickname));
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
+        }
     }
 
     /**
@@ -108,9 +130,9 @@ public class MemberService {
         return new PatchNoticeResDto(target.get().isPushApprove());
     }
 
-    public PostUserDataResDto updateUserByUUID(UUID userIdx, PostUserDataReqDto dto) throws BaseException {
+    public PostUserDataResDto updateUserByUUID(UUID memberIdx, PostUserDataReqDto dto) throws BaseException {
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+        Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
@@ -121,21 +143,13 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
 
-
-        try{
-            memberRepository.save(currentUser);
-        }catch (Exception exception){
-            log.error("Member database update중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
         return new PostUserDataResDto(true);
 
     }
 
-    public PostUserDataResDto updateUserPasswordByUUID(UUID userIdx, PutPasswordUpdateDto dto) throws BaseException {
+    public PostUserDataResDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+        Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
@@ -145,14 +159,28 @@ public class MemberService {
             log.error("Member PW update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
         }
-        try{
-            memberRepository.save(currentUser);
-        }catch (Exception exception){
-            log.error("Member database update중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
 
         return new PostUserDataResDto(true);
 
+    }
+
+    public Boolean updateUserPasswordByEmail(PatchPasswordLostReq dto) throws BaseException {
+        Optional<Member> res = memberRepository.findByUserId(dto.getEmail());
+
+        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        try{
+            currentUser.updatePassword(passwordEncoder.encode(dto.getNewPw()));
+        }catch (Exception exception){
+            log.error("Member PW update중 문제 발생 : " + exception.getMessage());
+            throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
+        }
+
+        return true;
+    }
+
+    public Boolean isEmailExist(String to) throws BaseException{
+        Optional<Member> member = memberRepository.findByUserId(to);
+        return member.isPresent();
     }
 }

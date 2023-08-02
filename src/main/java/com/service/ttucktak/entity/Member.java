@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(name = "member_idx", nullable = false)
     private UUID memberIdx;
 
-    @Column(name = "user_id", length = 45, nullable = false)
+    @Column(name = "user_id", length = 45, nullable = false, unique = true)
     private String userId;
 
     @Column(name = "user_pw", length = 500, nullable = false)
@@ -63,7 +64,7 @@ public class Member extends BaseEntity implements UserDetails {
     private String refreshToken;
 
     @Builder
-    public Member(Date createdAt, Date updatedAt, Boolean status, UUID memberIdx, String userId, String userPw, String nickname, AccountType accountType, String profileImgUrl, boolean adProvision, boolean pushApprove, boolean nightApprove, String refreshToken) {
+    public Member(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID memberIdx, String userId, String userPw, String nickname, AccountType accountType, String profileImgUrl, boolean adProvision, boolean pushApprove, boolean nightApprove, String refreshToken) {
         super(createdAt, updatedAt, status);
         this.memberIdx = memberIdx;
         this.userId = userId;

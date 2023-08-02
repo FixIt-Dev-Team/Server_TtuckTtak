@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -37,16 +38,20 @@ public class SolutionDetail extends BaseEntity {
     @Column(name = "content", length = 500, nullable = false)
     private String content;
 
+    @Column(name = "sub_content", length = 500, nullable = false)
+    private String subContent;
+
     @Column(name = "sol_order", nullable = false)
     private Integer SolutionOrder;
 
     @Builder
-    public SolutionDetail(Date createdAt, Date updatedAt, Boolean status, UUID detailIdx, Solution solutionIdx, String detailHeader, String content, Integer solutionOrder) {
+    public SolutionDetail(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID detailIdx, Solution solutionIdx, String detailHeader, String content, String subContent, Integer solutionOrder) {
         super(createdAt, updatedAt, status);
         this.detailIdx = detailIdx;
         this.solutionIdx = solutionIdx;
         this.detailHeader = detailHeader;
         this.content = content;
+        this.subContent = subContent;
         SolutionOrder = solutionOrder;
     }
 }

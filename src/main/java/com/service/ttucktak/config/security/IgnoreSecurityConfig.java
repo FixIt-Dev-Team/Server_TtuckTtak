@@ -34,16 +34,19 @@ public class IgnoreSecurityConfig {
                 .requestMatchers("/api/auths/signup").permitAll()
                 .requestMatchers("/api/auths/login").permitAll()
                 .requestMatchers("/api/auths/email-confirm").permitAll()
-                .requestMatchers("/api/auths/nickname/**").permitAll()
                 .requestMatchers("/api/auths/oauth2/kakao").permitAll()
                 .requestMatchers("/api/auths/oauth2/kakao/test").permitAll()
                 .requestMatchers("/api/auths/oauth2/login/kakao").permitAll()
                 .requestMatchers("/api/auths/oauth2/google").permitAll()
                 .requestMatchers("/api/auths/oauth2/login/google").permitAll()
+                .requestMatchers("/api/members/nickname/**").permitAll()
                 .requestMatchers("/oauth2/authorization/kakao").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger-ui/index.html").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/page/leafs/**").permitAll()
+                .requestMatchers("/api/members/password/lost").permitAll()
+                .requestMatchers("/api/members/password/email").permitAll()
                 .anyRequest().permitAll();
 
         return http.build();

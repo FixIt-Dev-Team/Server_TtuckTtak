@@ -26,6 +26,7 @@ import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
     private final FileService fileService;
     private final MemberRepository memberRepository;
@@ -62,22 +63,6 @@ public class AuthService {
         } catch (BaseException e) {
             log.error(e.getErrorCode().getMessage());
             throw e;
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-    }
-
-    /**
-     * 사용 가능한 닉네임인지 확인
-     */
-    @Transactional(readOnly = true)
-    public GetNicknameAvailableResDto nicknameAvailable(String nickname) throws BaseException {
-        try {
-            // 동일한 닉네임 가지고 있는지 확인
-            // 이미 동일한 닉네임을 가지고 있는 경우 사용 불가, 없는 경우는 사용 가능
-            return new GetNicknameAvailableResDto(!memberRepository.existsMemberByNickname(nickname));
 
         } catch (Exception e) {
             log.error(e.getMessage());

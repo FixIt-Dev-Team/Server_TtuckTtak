@@ -24,8 +24,9 @@ public enum BaseErrorCode {
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "아이디나 비밀번호를 확인해주세요"),
-    UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "userIdx 값에 오류 발생"),
+    UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "Idx 값에 오류 발생"),
     NOTICE_REQ_ERROR(HttpStatus.BAD_REQUEST.value(), "현 설정과 동일한 값입니다."),
+    MEMBER_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "해당 이메일을 사용하는 유저가 존재하지 않습니다."),
 
     /**
      * 401 : UNATHORIZED
@@ -37,6 +38,8 @@ public enum BaseErrorCode {
      */
     KAKAO_EMAIL_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "카카오 이메일 동의가 필요합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "유저가 존재하지 않습니다."),
+    SOLUTION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "솔루션이 존재하지 않습니다."),
+    SOLUTION_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "솔루션 상세정보가 존재하지 않습니다."),
 
     /**
      * 409 : Conflict
