@@ -178,4 +178,9 @@ public class MemberService {
 
         return true;
     }
+
+    public Boolean isEmailExist(String to) throws BaseException{
+        Optional<Member> member = memberRepository.findByUserId(to);
+        return member.isPresent();
+    }
 }

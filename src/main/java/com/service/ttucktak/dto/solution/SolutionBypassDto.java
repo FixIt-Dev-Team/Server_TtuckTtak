@@ -16,20 +16,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SolutionBypassDto {
 
-    @Schema(name = "bypassIdx", example = "UUID String", description = "Bypass UUID")
+    @Schema(name = "bypassIdx", example = "UUID 문자열", description = "Bypass UUID")
     private UUID bypassIdx;
 
-    @Schema(name = "startEntryIdx", example = "Long Type", description = "접근 엔트리Idx")
+    @Schema(name = "startEntryIdx", example = "Long Type Idx", description = "바이패스 출발 엔트리 Idx (현재 엔트리)")
     private Long startEntryIdx;
 
-    @Schema(name = "targetEntryIdx", example = "Long Type", description = "타겟 엔트리Idx")
+    @Schema(name = "targetEntryIdx", example = "Long Type Idx", description = "바이패스 도착 엔트리Idx (바이패스할 엔트리)")
     private Long targetEntryIdx;
 
-    @Schema(name = "targetEntryName", example = "Long Type", description = "타겟 엔트리 네임")
-    private Long targetEntryName;
+    @Schema(name = "targetEntryName", example = "바이패스할 엔트리 네임", description = "바이패스 도착 엔트리 네임")
+    private String targetEntryName;
 
     @Builder
-    public SolutionBypassDto(UUID bypassIdx, Long startEntryIdx, Long targetEntryIdx, Long targetEntryName) {
+    public SolutionBypassDto(UUID bypassIdx, Long startEntryIdx, Long targetEntryIdx, String targetEntryName) {
         this.bypassIdx = bypassIdx;
         this.startEntryIdx = startEntryIdx;
         this.targetEntryIdx = targetEntryIdx;

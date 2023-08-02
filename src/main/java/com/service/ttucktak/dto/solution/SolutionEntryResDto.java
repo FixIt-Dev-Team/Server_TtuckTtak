@@ -13,22 +13,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SolutionEntryResDto {
 
-    @Schema(name = "entry_idx", example = "Long Type", description = "엔트리 Idx")
+    @Schema(name = "entry_idx", example = "솔루션 엔트리 Idx (Long)", description = "솔루션 엔트리 Idx")
     private Long entryIdx;
 
-    @Schema(name = "level", example = "Integer Type", description = "차수")
+    @Schema(name = "level", example = "솔루션 차수 Integer)", description = "솔루션 차수")
     private Integer level;
 
-    @Schema(name = "problem_name", example = "Long Type", description = "문제 명칭")
+    @Schema(name = "problem_name", example = "문제 명칭", description = "문제 명칭")
     private String problemName;
 
-    //@Schema(name = "Solution List", example = "솔루션 리스트", description = "해결법 리스트")
+    @Schema(name = "Solution List", description = "솔루션 리스트")
     private List<SolutionDto> solutionDtos;
 
-    //@Schema(name = "SolutionPossible List", example = "예상 원인 리스트", description = "예상 원인 리스트")
+    @Schema(name = "SolutionPossible List", description = "예상 원인 리스트")
     private List<SolutionPossibleDto> solutionPossibleDtos;
 
-    //@Schema(name = "SolutionBypass List", example = "솔루션 바이패스 리스트", description = "바이패스 리스트")
+    @Schema(name = "SolutionBypass List", description = "바이패스 리스트")
     private List<SolutionBypassDto> solutionBypassDtos;
 
     @Builder

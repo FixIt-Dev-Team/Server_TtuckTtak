@@ -44,8 +44,8 @@ public class SolutionController {
             @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/entry")
-    public BaseResponse<SolutionEntryResDto> findEntry(@RequestBody SolutionEntryReqDto req, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt){
+    @PostMapping ("/entry")
+    public BaseResponse<SolutionEntryResDto> findEntry(@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt, @RequestBody SolutionEntryReqDto req){
 
         try{
             return new BaseResponse<>(solutionService.findAndThrowSolution(req));
