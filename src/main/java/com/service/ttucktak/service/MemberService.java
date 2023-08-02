@@ -2,7 +2,10 @@ package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+
+import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
 import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
+
 import com.service.ttucktak.dto.auth.PostUserDataReqDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
@@ -164,14 +167,23 @@ public class MemberService {
             log.error("Member PW update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
         }
-        try{
-            memberRepository.save(currentUser);
-        }catch (Exception exception){
-            log.error("Member database update중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
 
         return new PostUserDataResDto(true);
 
+    }
+
+    public Boolean updateUserPasswordByEmail(PatchPasswordLostReq dto) throws BaseException {
+        Optional<Member> res = memberRepository.findByUserId(dto.getEmail());
+
+        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        try{
+            currentUser.updatePassword(passwordEncoder.encode(dto.getNewPw()));
+        }catch (Exception exception){
+            log.error("Member PW update중 문제 발생 : " + exception.getMessage());
+            throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
+        }
+
+        return true;
     }
 }

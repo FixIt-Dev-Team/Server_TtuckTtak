@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeHttpRequests() //Http Request를 인가하라
-                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/members/**").permitAll()
                 .requestMatchers("/api/views/**").permitAll()
                 .requestMatchers("/api/solutions/**").permitAll()
                 .anyRequest().authenticated()// 이외의 접근은 인증이 필요하다
@@ -66,6 +66,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * 시큐리티 제공 패스워드 인코더
+     * */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

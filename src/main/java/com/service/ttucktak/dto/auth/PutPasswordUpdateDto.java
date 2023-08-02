@@ -14,5 +14,4 @@ public class PutPasswordUpdateDto {
     private String userIdx;
     @Schema(name = "newPw", example = "12345678!A", requiredProperties = "true", description = "요청된 패스워드 업데이트")
     private String newPw;
-
 }

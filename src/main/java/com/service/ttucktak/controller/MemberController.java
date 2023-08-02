@@ -4,6 +4,7 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
+import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
 import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
@@ -11,6 +12,7 @@ import com.service.ttucktak.dto.member.PatchNicknameReqDto;
 import com.service.ttucktak.dto.member.PatchNicknameResDto;
 import com.service.ttucktak.dto.member.PatchNoticeReqDto;
 import com.service.ttucktak.dto.member.PatchNoticeResDto;
+import com.service.ttucktak.service.EmailService;
 import com.service.ttucktak.entity.annotation.Nickname;
 import com.service.ttucktak.service.MemberService;
 import com.service.ttucktak.utils.JwtUtil;
@@ -23,7 +25,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.ui.Model;
+
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -41,11 +47,14 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    private final EmailService emailService;
+
     @Autowired
-    public MemberController(JwtUtil jwtUtil, RegexUtil regexUtil, MemberService memberService) {
+    public MemberController(JwtUtil jwtUtil, RegexUtil regexUtil, MemberService memberService, EmailService emailService){
         this.jwtUtil = jwtUtil;
         this.regexUtil = regexUtil;
         this.memberService = memberService;
+        this.emailService = emailService;
     }
 
     /**
@@ -152,5 +161,36 @@ public class MemberController {
         if (!RegexUtil.isValidPwFormat(reqDto.getNewPw())) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
 
         return new BaseResponse<>(memberService.updateUserPasswordByUUID(userIdx, reqDto));
+    }
+
+    @PatchMapping("/password/lost")
+    public Boolean updatePasswordLost(@RequestBody PatchPasswordLostReq reqDto) throws Exception{
+
+        log.error(reqDto.getEmail());
+        if (!RegexUtil.isValidPwFormat(reqDto.getNewPw())) throw new BaseException(BaseErrorCode.INVALID_PW_FORMAT);
+
+        try{
+            return memberService.updateUserPasswordByEmail(reqDto);
+        }catch (BaseException exception){
+            log.error(exception.getMessage());
+            throw exception;
+        }
+
+    }
+
+    /**
+     * 타임리프 비밀번호 변경 페이지 이메일 전송 API
+     * */
+    //TODO: Validation 처리와 스웨거 붙이기
+    @GetMapping("/password/email")
+    public BaseResponse<Boolean> passwordPage(Model model, @RequestParam("target-email") String to) throws BaseException{
+        try{
+            String addr = "https://ttukttak.store/page/leafs/password/page?email=" + to;
+            return new BaseResponse<>(emailService.sendPasswordModify(to, addr));
+
+        }catch (BaseException exception){
+            throw exception;
+        }
+
     }
 }

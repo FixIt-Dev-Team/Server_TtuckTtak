@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (BaseException exception) {
                 log.error(exception.getMessage());
+                //TODO BaseException으로 바꾸기
                 throw new RuntimeException(exception);
             }
         }
