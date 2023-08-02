@@ -85,4 +85,30 @@ public class EmailServiceImpl implements EmailService {
             throw new BaseException(BaseErrorCode.UNEXPECTED_ERROR);
         }
     }
+
+    /**
+     * 비밀번호 수정 이메일 전송 메서드
+     * */
+    @Override
+    public Boolean sendPasswordModify(String to, String addr) throws BaseException {
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+
+            message.addRecipients(TO, to); // 보내는 대상
+            message.setSubject("[뚝딱] 비밀번호 찾기"); // 제목
+
+            message.setText(addr);
+            message.setFrom(new InternetAddress(myEmail, "뚝딱")); // 보내는 사람
+
+            emailSender.send(message);
+
+            return true;
+        }
+        catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.UNEXPECTED_ERROR);
+        }
+
+    }
 }

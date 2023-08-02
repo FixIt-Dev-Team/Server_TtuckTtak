@@ -27,6 +27,17 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  thymeleaf:
+    # 루트 폴더 변경 -> src/resources/templates/thymeleaf
+    # 기본값 -> src/resources/templates
+    prefix: classpath:templates/thymeleaf/
+    check-template-location: true
+    # 스캔 대상 파일 확장자
+    suffix: .html
+    # 탬플릿 모드
+    mode: HTML
+    # 브라우저 캐싱 여부 (개발시에는 안함)
+    cache: false
 
 #스웨거 springdoc 세팅
 springdoc:
