@@ -17,7 +17,7 @@ public class UserDataDto {
     private String email;
     @Schema(name = "profileImgUrl", example = "http://test_img", requiredProperties = "true", description = "유저 프로필 이미지 url")
     private String profileImgUrl;
-    @Schema(name = "accountType", example = "test_type", requiredProperties = "true", description = "유저 타")
+    @Schema(name = "accountType", example = "test_type", requiredProperties = "true", description = "유저 타입")
     private AccountType accountType;
 
     @Builder

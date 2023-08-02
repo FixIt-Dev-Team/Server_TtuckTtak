@@ -33,10 +33,10 @@ public class SolutionBypass extends BaseEntity {
     private Long targetEntryIdx;
 
     @Column(name = "target_entry_name", nullable = false)
-    private Long targetEntryName;
+    private String targetEntryName;
 
     @Builder
-    public SolutionBypass(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID bypassIdx, Long startEntryIdx, Long targetEntryIdx, Long targetEntryName) {
+    public SolutionBypass(LocalDateTime createdAt, LocalDateTime updatedAt, Boolean status, UUID bypassIdx, Long startEntryIdx, Long targetEntryIdx, String targetEntryName) {
         super(createdAt, updatedAt, status);
         this.bypassIdx = bypassIdx;
         this.startEntryIdx = startEntryIdx;

@@ -15,19 +15,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SolutionEntryDto {
 
-    @Schema(name = "entry_idx", example = "Long Type", description = "엔트리 Idx")
+    @Schema(name = "entry_idx", example = "솔루션 엔트리 Idx (Long)", description = "솔루션 엔트리 Idx")
     private Long entryIdx;
 
-    @Schema(name = "survey_idx", example = "Long Type", description = "서베이 Idx")
+    @Schema(name = "survey_idx", example = "설문 Idx (Long)", description = "안드로이드 설문 Idx")
     private Long surveyIdx;
 
-    @Schema(name = "res_pattern", example = "Long Type", description = "응답 패턴")
+    @Schema(name = "res_pattern", example = "안드로이드 설문 응답 패턴(Long)", description = "안드로이드 설문 응답 패턴")
     private Long resPattern;
 
-    @Schema(name = "issue_type", example = "Long Type", description = "이슈 타입")
+    @Schema(name = "issue_type", example = "솔루션 이슈 타입 (Long)", description = "이슈 타입")
     private Long issueType;
 
-    @Schema(name = "problem_name", example = "String Name", description = "문제 명칭")
+    @Schema(name = "problem_name", example = "문제 이름", description = "문제 이름")
     private String problemName;
 
     @Builder

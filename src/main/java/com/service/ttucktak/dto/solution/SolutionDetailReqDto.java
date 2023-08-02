@@ -14,7 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SolutionDetailReqDto {
 
-    @Schema(name = "sol_idx", example = "UUID String", description = "타겟 솔루션 Idx")
+    @Schema(name = "sol_idx", example = "UUID String", description = "솔루션 Idx")
     private String solutionIdx;
 
     @Builder

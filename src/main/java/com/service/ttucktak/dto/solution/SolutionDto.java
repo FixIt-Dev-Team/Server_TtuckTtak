@@ -15,16 +15,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SolutionDto {
 
-    @Schema(name = "sol_idx", example = "UUID String", description = "UUID 스트링")
+    @Schema(name = "sol_idx", example = "UUID 문자열", description = "솔루션 UUID 스트링")
     private UUID solutionIdx;
 
-    @Schema(name = "issue_type", example = "Long Type", description = "이슈 타입")
+    @Schema(name = "issue_type", example = "이슈 타입 (Long)", description = "솔루션 이슈 타입")
     private Long issueType;
 
-    @Schema(name = "desc_header", example = "String Header", description = "솔루션 헤더")
+    @Schema(name = "desc_header", example = "솔루션 제목", description = "솔루션 제목")
     private String descHeader;
 
-    @Schema(name = "level", example = "Integer Type", description = "차수")
+    @Schema(name = "level", example = "솔루션 차수(Integer)", description = "솔루션 차수")
     private Integer level;
 
     @Builder
