@@ -144,7 +144,7 @@ public class MemberController {
         UUID userIdx;
 
         try{
-            userIdx = UUID.fromString(reqDto.getUserIdx());
+            userIdx = UUID.fromString(reqDto.getMemberIdx());
         }catch(Exception exception){
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }

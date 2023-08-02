@@ -127,9 +127,9 @@ public class MemberService {
         return new PatchNoticeResDto(target.get().isPushApprove());
     }
 
-    public PostUserDataResDto updateUserByUUID(UUID userIdx, PostUserDataReqDto dto) throws BaseException {
+    public PostUserDataResDto updateUserByUUID(UUID memberIdx, PostUserDataReqDto dto) throws BaseException {
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+        Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
@@ -140,21 +140,13 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
 
-
-        try{
-            memberRepository.save(currentUser);
-        }catch (Exception exception){
-            log.error("Member database update중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
-        }
-
         return new PostUserDataResDto(true);
 
     }
 
-    public PostUserDataResDto updateUserPasswordByUUID(UUID userIdx, PutPasswordUpdateDto dto) throws BaseException {
+    public PostUserDataResDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
 
-        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+        Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
 
@@ -163,12 +155,6 @@ public class MemberService {
         }catch (Exception exception){
             log.error("Member PW update중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
-        }
-        try{
-            memberRepository.save(currentUser);
-        }catch (Exception exception){
-            log.error("Member database update중 문제 발생 : " + exception.getMessage());
-            throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }
 
         return new PostUserDataResDto(true);

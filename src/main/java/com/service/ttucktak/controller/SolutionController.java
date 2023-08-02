@@ -67,10 +67,10 @@ public class SolutionController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/detail")
-    public BaseResponse<SolutionDetailResDto> findDetail(@RequestBody SolutionDetailReqDto req, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt){
+    public BaseResponse<SolutionDetailResDto> findDetail(@RequestParam("solutionIdx") String solutionIdx, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt){
 
         try{
-            return new BaseResponse<>(solutionService.loadDetail(req));
+            return new BaseResponse<>(solutionService.loadDetail(solutionIdx));
         }catch (BaseException exception){
             return new BaseResponse<>(exception);
         }

@@ -128,12 +128,12 @@ public class SolutionService {
                 .build();
     }
 
-    public SolutionDetailResDto loadDetail(SolutionDetailReqDto req) throws BaseException {
+    public SolutionDetailResDto loadDetail(String solutionIdx) throws BaseException {
 
         UUID solIdx;
 
         try{
-            solIdx = UUID.fromString(req.getSolutionIdx());
+            solIdx = UUID.fromString(solutionIdx);
         }catch (Exception e){
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }

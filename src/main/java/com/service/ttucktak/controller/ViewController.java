@@ -56,18 +56,18 @@ public class ViewController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/setting")
-    public BaseResponse<UserDataDto> settingView(@RequestParam("userIdx") String userIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+    public BaseResponse<UserDataDto> settingView(@RequestParam("memberIdx") String memberIdx,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
 
-        UUID userId;
+        UUID memberId;
 
         try{
-            userId = UUID.fromString(userIdx);
+            memberId = UUID.fromString(memberIdx);
         }catch(Exception exception){
             log.error("UUID 변환중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(memberService.loadUserByUUID(userId));
+        return new BaseResponse<>(memberService.loadUserByUUID(memberId));
 
     }
 
@@ -107,16 +107,16 @@ public class ViewController {
             // 차후 이미지 DB 준비 마무리 되면 그때 추가 작업.
         }
 
-        UUID userIdx;
+        UUID memberIdx;
 
         try{
-            userIdx = UUID.fromString(reqDto.getUserIdx());
+            memberIdx = UUID.fromString(reqDto.getMemberIdx());
         }catch(Exception exception){
             log.error("UUID 변환중 문제 발생 : " + exception.getMessage());
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(memberService.updateUserByUUID(userIdx,reqDto));
+        return new BaseResponse<>(memberService.updateUserByUUID(memberIdx,reqDto));
 
     }
 
