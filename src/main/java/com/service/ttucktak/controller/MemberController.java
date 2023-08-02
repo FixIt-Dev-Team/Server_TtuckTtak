@@ -5,13 +5,9 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
-import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
+import com.service.ttucktak.dto.member.*;
 import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
-import com.service.ttucktak.dto.member.PatchNicknameReqDto;
-import com.service.ttucktak.dto.member.PatchNicknameResDto;
-import com.service.ttucktak.dto.member.PatchNoticeReqDto;
-import com.service.ttucktak.dto.member.PatchNoticeResDto;
 import com.service.ttucktak.service.EmailService;
 import com.service.ttucktak.entity.annotation.Nickname;
 import com.service.ttucktak.service.MemberService;
@@ -163,6 +159,7 @@ public class MemberController {
         return new BaseResponse<>(memberService.updateUserPasswordByUUID(userIdx, reqDto));
     }
 
+    @Operation(deprecated = true)
     @PatchMapping("/password/lost")
     public Boolean updatePasswordLost(@RequestBody PatchPasswordLostReq reqDto) throws Exception{
 
@@ -181,16 +178,23 @@ public class MemberController {
     /**
      * 타임리프 비밀번호 변경 페이지 이메일 전송 API
      * */
-    //TODO: Validation 처리와 스웨거 붙이기
-    @GetMapping("/password/email")
-    public BaseResponse<Boolean> passwordPage(Model model, @RequestParam("target-email") String to) throws BaseException{
-        try{
-            String addr = "https://ttukttak.store/page/leafs/password/page?email=" + to;
-            return new BaseResponse<>(emailService.sendPasswordModify(to, addr));
-
-        }catch (BaseException exception){
-            throw exception;
+    @Operation(summary = "비밀번호 변경 이메일 보내기", description = "비밀번호 변경 이메일을 보내기 위한 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "올바르지 않은 이메일입니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "해당 이메일을 사용하는 유저가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+    })
+    @PutMapping ("/password/email")
+    public BaseResponse<PutPasswordEmailRes> passwordPage(Model model, @RequestParam("target-email") String to) throws BaseException{
+        if(!RegexUtil.isValidEmailFormat(to)){
+            throw new BaseException(BaseErrorCode.INVALID_EMAIL);
         }
+
+        if(!memberService.isEmailExist(to)) throw new BaseException(BaseErrorCode.MEMBER_NOT_EXIST);
+
+        String addr = "https://ttukttak.store/page/leafs/password/page?email=" + to;
+        return new BaseResponse<>(new PutPasswordEmailRes(emailService.sendPasswordModify(to, addr)));
 
     }
 }
