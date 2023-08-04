@@ -131,6 +131,10 @@ public class Member extends BaseEntity implements UserDetails {
         return pushApprove;
     }
 
+    public boolean isNightPushApprove() {
+        return nightApprove;
+    }
+
     /**
      * UserDetail 구현 메서드
      */
