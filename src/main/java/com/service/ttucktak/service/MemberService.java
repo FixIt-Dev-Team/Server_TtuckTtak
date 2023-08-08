@@ -90,6 +90,19 @@ public class MemberService {
         return user;
     }
 
+    public UserNoticeDto loadUserPushByUUID(UUID userIdx) throws BaseException {
+        Optional<Member> res = memberRepository.findByMemberIdx(userIdx);
+
+        Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        UserNoticeDto notice = UserNoticeDto.builder()
+                .pushStatus(currentUser.isPushApprove())
+                .nightPushStatus(currentUser.isNightPushApprove())
+                .build();
+
+        return notice;
+    }
+
     /**
      * Push 알람 설정 API - Service
      * */
@@ -131,6 +144,11 @@ public class MemberService {
     }
 
     public PostUserDataResDto updateUserByUUID(UUID memberIdx, PostUserDataReqDto dto) throws BaseException {
+
+        if(memberRepository.existsMemberByNickname(dto.getNickName())){
+            log.error("Member update중 닉네임 중복 발생 : " );
+            throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+        }
 
         Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
