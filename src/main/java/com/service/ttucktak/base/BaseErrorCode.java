@@ -27,6 +27,9 @@ public enum BaseErrorCode {
     UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "Idx 값에 오류 발생"),
     NOTICE_REQ_ERROR(HttpStatus.BAD_REQUEST.value(), "현 설정과 동일한 값입니다."),
     MEMBER_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "해당 이메일을 사용하는 유저가 존재하지 않습니다."),
+    MEMBERIDX_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "유저가 존재하지 않습니다."),
+    REFRESH_EXPIRED(HttpStatus.BAD_REQUEST.value(), "리프래시 토큰 만료 재 로그인 바랍니다."),
+    INVALID_REFRESH(HttpStatus.BAD_REQUEST.value(), "리프레시 토큰 불일치 재 로그인 바랍니다."),
 
     /**
      * 401 : UNATHORIZED
