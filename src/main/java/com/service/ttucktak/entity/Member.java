@@ -45,8 +45,8 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(name = "accountType", nullable = false)
     private AccountType accountType;
 
-    @Column(name = "profile_img_url", nullable = false)
-    private String profileImgUrl = "default url";
+    @Column(name = "profile_img_url")
+    private String profileImgUrl;
 
     // 서비스 홍보 약관
     @Column(name = "ad_provision", nullable = false)

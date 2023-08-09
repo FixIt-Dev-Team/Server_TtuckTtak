@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,6 +67,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
+    @Transactional
     public BaseResponse<PostLoginRes> signUp(@RequestBody @Valid PostSignUpReqDto data) {
         try {
             // 회원가입한 사용자의 정보를 기반으로 로그인 처리
@@ -100,6 +102,25 @@ public class AuthController {
             log.error(e.getMessage());
             return new BaseResponse<>(e);
         }
+    }
+
+    /**
+     * 토큰 갱신
+     * */
+    @Operation(summary = "AccessToken 갱신", description = "AccessToken 갱신을 위한 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "리프래시 토큰 만료 재 로그인 바랍니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "리프레시 토큰 불일치 재 로그인 바랍니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/token/refresh")
+    public BaseResponse<TokensDto> refreshAccessToken(@RequestBody PostRefreshTokenDto req) throws Exception {
+        return new BaseResponse<>(authService.refreshAccessToken(req));
     }
 
     @Operation(summary = "리프레쉬 토큰 비활성 (서비스 내부 로그아웃)", description = "사용자의 계정 로그아웃 처리")

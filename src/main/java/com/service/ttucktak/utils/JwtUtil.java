@@ -8,6 +8,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,12 +35,19 @@ public class JwtUtil {
     @Value("${jwt.secret-key}")
     private String jwtKey;
 
+    private AES256 aes256;
+
+    @Autowired
+    public JwtUtil(AES256 aes256) {
+        this.aes256 = aes256;
+    }
+
     /**
      * create accessToken and refreshToken
      * @param authentication
      * @return TokensDto
      * */
-    public TokensDto createTokens(Authentication authentication){
+    public TokensDto createTokens(Authentication authentication, UUID memberIdx, String password) throws Exception {
         Key key = Keys.hmacShaKeyFor(jwtKey.getBytes());
 
         String authorities = authentication.getAuthorities().stream()
@@ -48,12 +56,13 @@ public class JwtUtil {
 
         Date now = new Date();
         long validLength = 1000L * 60 * 60 * 24 * 7;
-        Date expireDate = new Date(validLength);
+        Date expireDate = new Date(System.currentTimeMillis() + validLength);
 
         String accessToken =  Jwts.builder()
                 .setHeaderParam("type", "jwt")
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
+                .claim("memberIdx", memberIdx.toString())
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -62,6 +71,7 @@ public class JwtUtil {
         String refreshToken = Jwts.builder()
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
+                .claim("password", aes256.encrypt(password))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
@@ -79,10 +89,11 @@ public class JwtUtil {
 
         try{
             claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(jwtKey).build()
+                    .setSigningKey(jwtKey.getBytes()).build()
                     .parseClaimsJws(token);
 
         } catch(Exception exception){
+            exception.printStackTrace();
             log.error(exception.getMessage());
             throw new BaseException(BaseErrorCode.INVALID_JWT_TOKEN);
         }
@@ -113,6 +124,32 @@ public class JwtUtil {
         }
 
         return false;
+    }
+
+    /**
+     * Check Refresh Token valid
+     * */
+    public String checkRefreshToken(String refreshToken) throws BaseException{
+        Jws<Claims> claims;
+
+        try{
+            log.info(String.valueOf(refreshToken));
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(jwtKey.getBytes())
+                    .build()
+                    .parseClaimsJws(refreshToken);
+
+            Date expired = claims.getBody().getExpiration();
+            Date now = new Date();
+
+            if(!expired.after(now)) throw new RuntimeException();
+
+            return aes256.decrypt(claims.getBody().get("password").toString());
+
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new BaseException(BaseErrorCode.REFRESH_EXPIRED);
+        }
     }
 
 }
