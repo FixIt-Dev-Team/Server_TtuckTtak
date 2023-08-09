@@ -48,7 +48,7 @@ public class SolutionController {
     public BaseResponse<SolutionEntryResDto> findEntry(@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt, @RequestBody SolutionEntryReqDto req){
 
         try{
-            return new BaseResponse<>(solutionService.findAndThrowSolution(req));
+            return new BaseResponse<>(solutionService.findAndThrowSolution(req,null));
         }catch (BaseException exception){
             return new BaseResponse<>(exception);
         }
@@ -93,12 +93,7 @@ public class SolutionController {
 
 
         try{
-            return new BaseResponse<>(solutionService.findAndThrowSolution(SolutionEntryReqDto.builder()
-                            .entryIdx(entryIdx)
-                            .surveyIdx(null)
-                            .resPattern(null)
-                            .level(1)
-                            .build()));
+            return new BaseResponse<>(solutionService.findAndThrowSolution(null,entryIdx));
         }catch (BaseException exception){
             return new BaseResponse<>(exception);
         }
