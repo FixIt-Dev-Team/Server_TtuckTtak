@@ -100,7 +100,7 @@ public class AuthService {
             // user Id를 기반으로 회원이 있는지 조회
             // 조회되는 유저가 없다면 login failed exception
             Member member = memberRepository.findByUserId(userID)
-                    .orElseThrow(() -> new BaseException(BaseErrorCode.MEMBER_NOT_EXIST));
+                    .orElseThrow(() -> new BaseException(BaseErrorCode.LOGIN_FAILED));
 
             // 조회된 유저와 비밀번호가 일치하는지 확인
             // 비밀번호가 일치하지 않는 경우 login failed exception
@@ -162,7 +162,7 @@ public class AuthService {
 
         try {
             Member member = memberRepository.findByMemberIdx(userIdx)
-                    .orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+                    .orElseThrow(() -> new BaseException(BaseErrorCode.USER_NOT_FOUND));
 
             member.updateRefreshToken(null);
 
@@ -243,5 +243,10 @@ public class AuthService {
         }
     }
 
-
+    /**
+     * 이메일 중복 체크
+     * */
+    public boolean isEmailExist(String to) {
+        return memberRepository.existsMemberByUserId(to);
+    }
 }
