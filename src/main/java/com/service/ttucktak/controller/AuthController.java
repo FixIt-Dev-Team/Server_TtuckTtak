@@ -63,6 +63,8 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
@@ -85,9 +87,11 @@ public class AuthController {
      */
     @Operation(summary = "로그인", description = "사용자의 id와 pw를 이용해 서비스 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
+            @ApiResponse(responseCode = "400", description = "이메일 혹은 비밀번호가 틀렸습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/login")
@@ -104,9 +108,11 @@ public class AuthController {
 
     @Operation(summary = "리프레쉬 토큰 비활성 (서비스 내부 로그아웃)", description = "사용자의 계정 로그아웃 처리")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "아이디나 비밀번호를 확인해주세요",
+            @ApiResponse(responseCode = "500", description = "Database result NotFound",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/logout")
@@ -151,7 +157,9 @@ public class AuthController {
     @Operation(summary = "카카오 계정을 통해 로그인", description = "사용자의 카카오 인가 코드를 사용하여 서비스에 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @GetMapping("/oauth2/kakao")
     public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode) {

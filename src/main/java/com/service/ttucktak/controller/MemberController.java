@@ -66,7 +66,7 @@ public class MemberController {
      */
     @Operation(summary = "닉네임 사용 가능 여부 확인", description = "해당 닉네임이 현재 사용 가능한지 확인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("nickname")
@@ -85,7 +85,7 @@ public class MemberController {
      */
     @Operation(summary = "닉네임 변경", description = "닉네임 변경을 위한 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/nickname")
@@ -102,13 +102,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database result NotFound",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다.",
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다. | Database result NotFound | Database Error | 멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다. | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     //Multipart form data임을 보여주어야 해서 어노테이션에 속성 추가
@@ -155,7 +149,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "현 설정과 동일한 값입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/push")
@@ -175,7 +169,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "현 설정과 동일한 값입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/push/night")
@@ -195,12 +189,8 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database result NotFound",
+            @ApiResponse(responseCode = "500", description = "Database result NotFound | Database Error | 패스워드 업데이트 처리중 예상치 못한 에러가 발생하였습니다. | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "패스워드 업데이트 처리중 예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/password")
     public BaseResponse<PostUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
@@ -238,9 +228,9 @@ public class MemberController {
      * */
     @Operation(summary = "비밀번호 변경 이메일 보내기", description = "비밀번호 변경 이메일을 보내기 위한 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "올바르지 않은 이메일입니다.",
+            @ApiResponse(responseCode = "400", description = "올바르지 않은 이메일입니다. | 해당 이메일을 사용하는 유저가 존재하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "해당 이메일을 사용하는 유저가 존재하지 않습니다.",
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PutMapping ("/password/email")
