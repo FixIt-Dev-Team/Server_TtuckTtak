@@ -47,6 +47,7 @@ public class IgnoreSecurityConfig {
                 .requestMatchers("/page/leafs/**").permitAll()
                 .requestMatchers("/api/members/password/lost").permitAll()
                 .requestMatchers("/api/members/password/email").permitAll()
+                .requestMatchers("/api/auths/token/refresh").permitAll()
                 .anyRequest().permitAll();
 
         return http.build();

@@ -51,21 +51,21 @@ public class SolutionService {
 
     }
 
-    public SolutionEntryResDto findAndThrowSolution(SolutionEntryReqDto req) throws BaseException {
+    public SolutionEntryResDto findAndThrowSolution(SolutionEntryReqDto req, Long entryIdx) throws BaseException {
 
         Optional<SolutionEntry> entry;
 
-        if(req.getSurveyIdx() !=null && req.getResPattern() != null){
+        if(req !=null){
             entry = solutionEntryRepository.findBySurveyIdxAndResPattern(req.getSurveyIdx(),req.getResPattern());
         }else{
-            entry = solutionEntryRepository.findByEntryIdx(req.getEntryIdx());
+            entry = solutionEntryRepository.findByEntryIdx(entryIdx);
         }
 
         entry.orElseThrow(()->new BaseException(BaseErrorCode.SOLUTION_NOT_FOUND));
 
         SolutionEntry solutionEntry = entry.get();
 
-        List<Solution> solutions = solutionRepository.findByIssueTypeAndLevel(solutionEntry.getIssueType(),req.getLevel());
+        List<Solution> solutions = solutionRepository.findByIssueTypeAndLevel(solutionEntry.getIssueType(),(req == null) ? 1 : req.getLevel());
 
         List<SolutionDto> solutionDtos = new ArrayList<SolutionDto>();
 
@@ -120,13 +120,15 @@ public class SolutionService {
 
         return SolutionEntryResDto.builder()
                 .entryIdx(solutionEntry.getEntryIdx())
-                .level(req.getLevel())
+                .level((req!=null) ? req.getLevel() : 1)
                 .problemName(solutionEntry.getProblemName())
                 .solutionDtos(solutionDtos)
                 .solutionPossibleDtos(solutionPossibleDtos)
                 .solutionBypassDtos(solutionBypassDtos)
                 .build();
     }
+
+    //체크 위해서 1로 처리중 실제론 0로 처리 요망.
 
     public SolutionDetailResDto loadDetail(String solutionIdx) throws BaseException {
 

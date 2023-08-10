@@ -27,6 +27,6 @@ public class BaseResponse<T> {
     public BaseResponse(BaseException exception){
         this.isSuccess = false;
         this.code = exception.errorCode.getStatus();
-        this.message =  exception.errorCode.getMessage();
+        this.message = exception.errorCode.getMessage();
     }
 }
