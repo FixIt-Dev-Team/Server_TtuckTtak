@@ -20,10 +20,12 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender emailSender;
 
+    private static final SecureRandom random = new SecureRandom();
+
     @Value("${spring.mail.username}")
     private String myEmail;
 
-    private final String ePw = createKey();
+    private String ePw;
 
     public EmailServiceImpl(JavaMailSender emailSender) {
         this.emailSender = emailSender;
@@ -31,6 +33,8 @@ public class EmailServiceImpl implements EmailService {
 
     // 메일의 내용을 작성하는 클래스
     private MimeMessage createMessage(String email) throws Exception {
+        ePw = createKey();
+
         log.info("보내는 대상: " + email);
         log.info("인증 번호: " + ePw);
         MimeMessage message = emailSender.createMimeMessage();
@@ -61,7 +65,7 @@ public class EmailServiceImpl implements EmailService {
     // 이메일로 발송할 인증코드를 생성하는 메서드
     private static String createKey() {
         StringBuilder key = new StringBuilder();
-        SecureRandom random = new SecureRandom();
+        random.setSeed(System.currentTimeMillis());
 
         // 숫자로 구성된 8자리 인증 코드 생성
         for (int i = 0; i < 8; i++) {

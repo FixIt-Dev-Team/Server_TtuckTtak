@@ -49,6 +49,7 @@ public enum BaseErrorCode {
      */
     ALREADY_EXIST_ID(HttpStatus.CONFLICT.value(), "이미 존재하는 아이디입니다."),
     ALREADY_EXIST_NICKNAME(HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
+    ALREADY_EXIST_EMAIL(HttpStatus.CONTINUE.value(), "이미 존재하는 이메일입니다."),
 
     /**
      * 500 : INTERNAL SERVER ERROR

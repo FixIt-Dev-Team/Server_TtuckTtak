@@ -53,20 +53,12 @@ public class AuthController {
      */
     @Operation(summary = "회원가입", description = "서비스에 회원가입 및 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다.",
+            @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다. | 닉네임 형식에 맞지 않습니다. | 비밀번호 형식에 맞지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "비밀번호 형식에 맞지 않습니다.",
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디입니다. | 이미 존재하는 닉네임입니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "닉네임 형식에 맞지 않습니다.",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디입니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/signup")
     @Transactional
@@ -91,10 +83,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "이메일 혹은 비밀번호가 틀렸습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req) {
@@ -113,13 +103,9 @@ public class AuthController {
      * */
     @Operation(summary = "AccessToken 갱신", description = "AccessToken 갱신을 위한 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "리프래시 토큰 만료 재 로그인 바랍니다.",
+            @ApiResponse(responseCode = "400", description = "리프래시 토큰 만료 재 로그인 바랍니다. | 유저가 존재하지 않습니다. | 리프레시 토큰 불일치 재 로그인 바랍니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "유저가 존재하지 않습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "리프레시 토큰 불일치 재 로그인 바랍니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/token/refresh")
@@ -129,12 +115,12 @@ public class AuthController {
 
     @Operation(summary = "리프레쉬 토큰 비활성 (서비스 내부 로그아웃)", description = "사용자의 계정 로그아웃 처리")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Database result NotFound",
+            @ApiResponse(responseCode = "400", description = "Idx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "404", description = "유저가 존재하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/logout")
     public BaseResponse<PostLogoutRes> userLogout(@RequestBody PostLogoutReq req) {
@@ -158,18 +144,19 @@ public class AuthController {
      */
     @Operation(summary = "이메일 인증", description = "유효한 이메일 인지 인증 코드를 보내 확인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일입니다.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/email-confirm")
-    public BaseResponse<PostEmailConfirmResDto> emailConfirm(@Email @RequestParam String to) {
-        try {
-            return new BaseResponse<>(emailService.sendSimpleMessage(to));
+    public BaseResponse<PostEmailConfirmResDto> emailConfirm(@Email @RequestParam String to) throws BaseException{
+        //이메일 존재 여부 체크
+        if(authService.isEmailExist(to)) throw new BaseException(BaseErrorCode.ALREADY_EXIST_EMAIL);
 
-        } catch (BaseException e) {
-            e.printStackTrace();
-            return new BaseResponse<>(e);
-        }
+        return new BaseResponse<>(emailService.sendSimpleMessage(to));
+
+
     }
 
     /**
@@ -177,25 +164,20 @@ public class AuthController {
      */
     @Operation(summary = "카카오 계정을 통해 로그인", description = "사용자의 카카오 인가 코드를 사용하여 서비스에 로그인")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "404", description = "카카오 이메일 동의가 필요합니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 카카오 로그인 중 오류발생 서버에 문의",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @GetMapping("/oauth2/kakao")
-    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode) {
+    public BaseResponse<PostLoginRes> kakaoOauth2(@RequestParam("code") String authCode) throws BaseException{
+        String authToken = oAuthService.getKakaoAccessToken(authCode);
 
-        try {
-            String authToken = oAuthService.getKakaoAccessToken(authCode);
+        SocialAccountUserInfo data = oAuthService.getKakaoUserInfo(authToken);
 
-            SocialAccountUserInfo data = oAuthService.getKakaoUserInfo(authToken);
+        return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.KAKAO));
+        //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
 
-            return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.KAKAO));
-            //유저 존재 여부에 따라 회원가입 처리후 로그인 처리
-        } catch (BaseException exception) {
-            log.error(exception.getMessage());
-            return new BaseResponse<>(exception);
-        }
     }
 
     /**
@@ -205,13 +187,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패. 오류 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 로그인 중 GoogleIDToken Payload 과정에서 오류 발생. 서버에 문의.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증 중 구글 시큐리티 문제 발생.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "구글 JWT 토큰 인증 중 IO 문제 발생.",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Database Error",
+            @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 구글 로그인 중 GoogleIDToken Payload 과정에서 오류 발생. 서버에 문의. | 구글 JWT 토큰 인증 중 구글 시큐리티 문제 발생. | 구글 JWT 토큰 인증 중 IO 문제 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/oauth2/google")

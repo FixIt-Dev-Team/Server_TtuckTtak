@@ -102,7 +102,7 @@ public class MemberController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "userIdx 값에 오류 발생",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다. | Database result NotFound | Database Error | 멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다. | 예상치 못한 에러가 발생하였습니다.",
+            @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다. | Database result NotFound | Database Error | 멤버 데이터 처리중 예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     //Multipart form data임을 보여주어야 해서 어노테이션에 속성 추가
