@@ -145,14 +145,16 @@ public class MemberService {
 
     public PostUserDataResDto updateUserByUUID(UUID memberIdx, PostUserDataReqDto dto) throws BaseException {
 
-        if(memberRepository.existsMemberByNickname(dto.getNickName())){
-            log.error("Member update중 닉네임 중복 발생 : " );
-            throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
-        }
-
         Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        if(!currentUser.getNickname().equals(dto.getNickName())){
+            if(memberRepository.existsMemberByNickname(dto.getNickName())){
+                log.error("Member update중 닉네임 중복 발생 : " );
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+            }
+        }
 
         try{
             currentUser.updateUserProfile(dto);
