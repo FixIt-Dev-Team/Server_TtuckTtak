@@ -2,7 +2,8 @@ package com.service.ttucktak.entity;
 
 import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseEntity;
-import com.service.ttucktak.dto.auth.PostUserDataReqDto;
+import com.service.ttucktak.dto.member.PatchUserDataReqDto;
+import com.service.ttucktak.dto.member.UserDataUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -14,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.UUID;
 
 @DynamicInsert
@@ -84,10 +84,10 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
-    public void updateUserProfile(PostUserDataReqDto dto) {
+    public void updateUserProfile(UserDataUpdateDto dto) {
         this.nickname = dto.getNickName();
-        if (dto.getImgUpdate() != null) {
-            this.profileImgUrl = dto.getImgUpdate();
+        if (dto.getImgUrl() != null) {
+            this.profileImgUrl = dto.getImgUrl();
         }
     }
 

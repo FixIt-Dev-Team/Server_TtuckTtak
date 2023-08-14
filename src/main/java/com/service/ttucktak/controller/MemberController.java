@@ -5,9 +5,9 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
 import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
-import com.service.ttucktak.dto.auth.PostUserDataReqDto;
+import com.service.ttucktak.dto.member.PatchUserDataReqDto;
 import com.service.ttucktak.dto.member.*;
-import com.service.ttucktak.dto.auth.PostUserDataResDto;
+import com.service.ttucktak.dto.member.PatchUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
 import com.service.ttucktak.service.EmailService;
 import com.service.ttucktak.entity.annotation.Nickname;
@@ -107,13 +107,13 @@ public class MemberController {
     })
     //Multipart form data임을 보여주어야 해서 어노테이션에 속성 추가
     @PatchMapping(value = "/updateprofile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") @Parameter(description = "Try It Out 클릭하시면 데이터가 나와요") PostUserDataReqDto reqDto,
-                                                           @RequestPart(value = "file", required = false) @Parameter(description = "프로필 이미지") MultipartFile file,
-                                                           @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+    public BaseResponse<PatchUserDataResDto> updateUserdata(@RequestPart(value = "ReqDto") @Parameter(description = "Try It Out 클릭하시면 데이터가 나와요") PatchUserDataReqDto reqDto,
+                                                            @RequestPart(value = "file", required = false) @Parameter(description = "프로필 이미지") MultipartFile file,
+                                                            @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+
+        String userImgUrl;
 
         if(file != null){
-
-            String userImgUrl;
 
             try{
 
@@ -124,9 +124,9 @@ public class MemberController {
                 throw new BaseException(BaseErrorCode.UNEXPECTED_ERROR);
             }
 
-            reqDto.setImgUpdate(userImgUrl);
-
             // 차후 이미지 DB 준비 마무리 되면 그때 추가 작업.
+        }else{
+            userImgUrl = null;
         }
 
         UUID memberIdx;
@@ -138,7 +138,9 @@ public class MemberController {
             throw new BaseException(BaseErrorCode.UUID_ERROR);
         }
 
-        return new BaseResponse<>(memberService.updateUserByUUID(memberIdx,reqDto));
+        UserDataUpdateDto dto = new UserDataUpdateDto(reqDto.getMemberIdx(), reqDto.getNickName(), userImgUrl);
+
+        return new BaseResponse<>(memberService.updateUserByUUID(memberIdx,dto));
 
     }
 
@@ -193,7 +195,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PatchMapping("/password")
-    public BaseResponse<PostUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto,@RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+    public BaseResponse<PatchUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
         UUID userIdx;
 
         try{
