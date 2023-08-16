@@ -25,6 +25,7 @@ import static com.service.ttucktak.utils.S3Util.Directory.PROFILE;
 
 @Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
     private final FileService fileService;
@@ -132,8 +133,7 @@ public class AuthService {
 
     /**
      * Access Token 갱신
-     * */
-    @Transactional
+     */
     public TokensDto refreshAccessToken(PostRefreshTokenDto req) throws Exception {
         //리프레시 토큰 만료 체크
         String password = jwtUtil.checkRefreshToken(req.getRefreshToken());
@@ -142,8 +142,8 @@ public class AuthService {
         Member member = memberRepository.findById(UUID.fromString(req.getUserIdx())).orElseThrow(() -> new BaseException(BaseErrorCode.MEMBERIDX_NOT_EXIST));
 
         //리프레시 요청 들어온 것과 db에 저장한 것이 일치하는 지 확인
-        if(!req.getRefreshToken().equals(member.getRefreshToken())) throw new BaseException(BaseErrorCode.INVALID_REFRESH);
-
+        if (!req.getRefreshToken().equals(member.getRefreshToken()))
+            throw new BaseException(BaseErrorCode.INVALID_REFRESH);
 
         //토큰을 생성해
         TokensDto tokens = generateToken(member.getUserId(), password, member.getMemberIdx(), password);
@@ -157,7 +157,6 @@ public class AuthService {
     /**
      * 로그아웃
      */
-    @Transactional
     public PostLogoutRes logout(UUID userIdx) throws BaseException {
 
         try {
@@ -192,7 +191,6 @@ public class AuthService {
     /**
      * 로그인 - 소셜 계정
      */
-    @Transactional
     public PostLoginRes loginWithSocialAccount(SocialAccountUserInfo data, AccountType type) throws BaseException {
         try {
             // 이메일(user id)을 기반으로 사용자를 조회한다
@@ -230,7 +228,7 @@ public class AuthService {
 
             // --- 로그인 처리 ---
             // 토큰을 발급받고, refresh token을 DB에 저장한다.
-            TokensDto token = generateToken(member.getUserId(), member.getUserId(), member.getMemberIdx(), member.getPassword());
+            TokensDto token = generateToken(member.getUserId(), member.getUserId(), member.getMemberIdx(), data.getUserEmail());
             member.updateRefreshToken(token.getRefreshToken());
 
             log.info(member.toString());
@@ -245,7 +243,8 @@ public class AuthService {
 
     /**
      * 이메일 중복 체크
-     * */
+     */
+    @Transactional(readOnly = true)
     public boolean isEmailExist(String to) {
         return memberRepository.existsMemberByUserId(to);
     }
