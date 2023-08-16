@@ -20,7 +20,7 @@ public class SolutionDetailResDto {
     @Schema(name = "detailHeader", example = "솔루션 제목", description = "솔루션 제목")
     private String detailHeader;
 
-    @Schema(name = "desc_header", description = "이미지 URL 스트링 리스트")
+    @Schema(name = "imageUrls", description = "이미지 URL 스트링 리스트")
     private List<String> imageUrls;
 
     @Schema(name = "content", example = "Example 솔루션 내용", description = "솔루션 내용")

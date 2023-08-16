@@ -18,13 +18,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SolutionPossibleDto {
 
-    @Schema(name = "possible_idx", example = "UUID 문자열", description = "가능한 원인 UUID String")
+    @Schema(name = "possibleIdx", example = "UUID 문자열", description = "가능한 원인 UUID String")
     private UUID possibleIdx;
 
-    @Schema(name = "entry_idx", example = "솔루션 엔트리 Idx (Long)", description = "솔루션 엔트리 Idx")
+    @Schema(name = "entryIdx", example = "솔루션 엔트리 Idx (Long)", description = "솔루션 엔트리 Idx")
     private Long entryIdx;
 
-    @Schema(name = "possible_name", example = "예상 원인명", description = "예상 원인명")
+    @Schema(name = "possibleName", example = "예상 원인명", description = "예상 원인명")
     private String possibleName;
 
     @Builder
