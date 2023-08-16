@@ -230,7 +230,7 @@ public class AuthService {
 
             // --- 로그인 처리 ---
             // 토큰을 발급받고, refresh token을 DB에 저장한다.
-            TokensDto token = generateToken(member.getUserId(), member.getUserId(), member.getMemberIdx(), member.getPassword());
+            TokensDto token = generateToken(member.getUserId(), member.getUserId(), member.getMemberIdx(), data.getUserEmail());
             member.updateRefreshToken(token.getRefreshToken());
 
             log.info(member.toString());
