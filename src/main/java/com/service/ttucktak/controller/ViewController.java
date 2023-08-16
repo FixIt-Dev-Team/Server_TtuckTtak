@@ -5,14 +5,11 @@ import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
-import com.service.ttucktak.dto.auth.PostUserDataReqDto;
-import com.service.ttucktak.dto.auth.PostUserDataResDto;
 import com.service.ttucktak.dto.member.UserDataDto;
 import com.service.ttucktak.dto.member.UserNoticeDto;
 import com.service.ttucktak.service.MemberService;
 import com.service.ttucktak.utils.S3Util;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,9 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 

@@ -6,8 +6,8 @@ import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.dto.auth.PatchPasswordLostReq;
 import com.service.ttucktak.dto.member.GetNicknameAvailableResDto;
 
-import com.service.ttucktak.dto.auth.PostUserDataReqDto;
-import com.service.ttucktak.dto.auth.PostUserDataResDto;
+import com.service.ttucktak.dto.member.PatchUserDataReqDto;
+import com.service.ttucktak.dto.member.PatchUserDataResDto;
 import com.service.ttucktak.dto.auth.PutPasswordUpdateDto;
 import com.service.ttucktak.dto.member.*;
 import com.service.ttucktak.entity.Member;
@@ -85,6 +85,8 @@ public class MemberService {
                 .email(currentUser.getUserId())
                 .profileImgUrl(currentUser.getProfileImgUrl())
                 .accountType(currentUser.getAccountType())
+                .pushStatus(currentUser.isPushApprove())
+                .nightPushStatus(currentUser.isNightPushApprove())
                 .build();
 
         return user;
@@ -143,16 +145,18 @@ public class MemberService {
         return new PatchNoticeResDto(target.get().isPushApprove());
     }
 
-    public PostUserDataResDto updateUserByUUID(UUID memberIdx, PostUserDataReqDto dto) throws BaseException {
-
-        if(memberRepository.existsMemberByNickname(dto.getNickName())){
-            log.error("Member update중 닉네임 중복 발생 : " );
-            throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
-        }
+    public PatchUserDataResDto updateUserByUUID(UUID memberIdx, UserDataUpdateDto dto) throws BaseException {
 
         Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
         Member currentUser = res.orElseThrow(() -> new BaseException(BaseErrorCode.DATABASE_NOTFOUND));
+
+        if(!currentUser.getNickname().equals(dto.getNickName())){
+            if(memberRepository.existsMemberByNickname(dto.getNickName())){
+                log.error("Member update중 닉네임 중복 발생 : " );
+                throw new BaseException(BaseErrorCode.ALREADY_EXIST_NICKNAME);
+            }
+        }
 
         try{
             currentUser.updateUserProfile(dto);
@@ -161,11 +165,11 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
 
-        return new PostUserDataResDto(true);
+        return new PatchUserDataResDto(true);
 
     }
 
-    public PostUserDataResDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
+    public PatchUserDataResDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
 
         Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
@@ -178,7 +182,7 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
         }
 
-        return new PostUserDataResDto(true);
+        return new PatchUserDataResDto(true);
 
     }
 
