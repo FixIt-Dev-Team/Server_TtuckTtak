@@ -33,10 +33,10 @@ public class SolutionDetail extends BaseEntity {
     private Solution solutionIdx;
 
     @Column(name = "detail_header", length = 500, nullable = false)
-    private String detailHeader;
+    private String content;
 
     @Column(name = "content", length = 500, nullable = false)
-    private String content;
+    private String detailHeader;
 
     @Column(name = "sub_content", length = 500, nullable = false)
     private String subContent;
