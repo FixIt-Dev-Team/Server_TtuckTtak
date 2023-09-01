@@ -195,7 +195,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PatchMapping("/password")
-    public BaseResponse<PatchUserDataResDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
+    public BaseResponse<PatchUserPasswordDto> updateUserdata(@RequestBody PutPasswordUpdateDto reqDto, @RequestHeader(CustomHttpHeaders.AUTHORIZATION) String jwt) throws BaseException{
         UUID userIdx;
 
         try{

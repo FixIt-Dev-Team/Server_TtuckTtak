@@ -3,6 +3,7 @@ package com.service.ttucktak.entity;
 import com.service.ttucktak.base.AccountType;
 import com.service.ttucktak.base.BaseEntity;
 import com.service.ttucktak.dto.member.PatchUserDataReqDto;
+import com.service.ttucktak.dto.member.UserDataDto;
 import com.service.ttucktak.dto.member.UserDataUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.text.ParseException;
@@ -89,6 +91,16 @@ public class Member extends BaseEntity implements UserDetails {
         if (dto.getImgUrl() != null) {
             this.profileImgUrl = dto.getImgUrl();
         }
+    }
+
+    public UserDataDto asUserDataDto(){
+        return UserDataDto.builder()
+                .userName(nickname)
+                .email(userId)
+                .profileImgUrl(profileImgUrl)
+                .nightPushStatus(nightApprove)
+                .pushStatus(pushApprove)
+                .accountType(accountType).build();
     }
 
     public void updateProfileImageUrl(String uploadedUrl) {

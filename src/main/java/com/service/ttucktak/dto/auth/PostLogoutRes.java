@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostLogoutRes {
-    @Schema(name = "isSuccess", example = "true", description = "회원가입 성공 여부")
-    @JsonProperty("isSuccess")
+    @Schema(name = "isSuccess", example = "true", description = "로그아웃 성공")
     boolean isSuccess;
 }
