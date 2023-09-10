@@ -230,7 +230,7 @@ public class MemberController {
      * */
     @Operation(summary = "비밀번호 변경 이메일 보내기", description = "비밀번호 변경 이메일을 보내기 위한 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "올바르지 않은 이메일입니다. | 해당 이메일을 사용하는 유저가 존재하지 않습니다.",
+            @ApiResponse(responseCode = "400", description = "이메일 형식에 맞지 않습니다. | 계정이 존재하지 않습니다!.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "예상치 못한 에러가 발생하였습니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
