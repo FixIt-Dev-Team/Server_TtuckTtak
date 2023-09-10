@@ -33,7 +33,7 @@ public class PostSignUpReqDto {
                 .nickname(nickname)
                 .accountType(AccountType.DEFAULT)
                 .adProvision(adProvision)
-                .profileImgUrl("https://ttuckttak.s3.ap-northeast-2.amazonaws.com/profile/%E2%80%94Pngtree%E2%80%94vector+edit+profile+icon_4101351.png") // Todo: default image url 설정 필요
+                .profileImgUrl("https://ttuckttak.s3.ap-northeast-2.amazonaws.com/profile/KakaoTalk_20230905_110330299.png") // Todo: default image url 설정 필요
                 .pushApprove(true)
                 .refreshToken(null)
                 .nightApprove(true)
