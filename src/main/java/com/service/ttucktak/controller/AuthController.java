@@ -166,6 +166,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "카카오 이메일 동의가 필요합니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "이미 사용중인 이메일입니다. 이전에 사용하시던 계정으로 사용해 주세요.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 카카오 로그인 중 오류발생 서버에 문의",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
@@ -186,6 +188,8 @@ public class AuthController {
     @Operation(summary = "구글 계정을 통해 로그인", description = "사용자의 구글 id token을 사용하여 서비스에 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패. 오류 발생.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "이미 사용중인 이메일입니다. 이전에 사용하시던 계정으로 사용해 주세요.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 구글 로그인 중 GoogleIDToken Payload 과정에서 오류 발생. 서버에 문의. | 구글 JWT 토큰 인증 중 구글 시큐리티 문제 발생. | 구글 JWT 토큰 인증 중 IO 문제 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))

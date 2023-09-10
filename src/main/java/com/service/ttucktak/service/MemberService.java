@@ -165,11 +165,11 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.MEMBER_ERROR);
         }
 
-        return new PatchUserDataResDto(true);
+        return new PatchUserDataResDto(true,currentUser.asUserDataDto());
 
     }
 
-    public PatchUserDataResDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
+    public PatchUserPasswordDto updateUserPasswordByUUID(UUID memberIdx, PutPasswordUpdateDto dto) throws BaseException {
 
         Optional<Member> res = memberRepository.findByMemberIdx(memberIdx);
 
@@ -182,7 +182,7 @@ public class MemberService {
             throw new BaseException(BaseErrorCode.PWUPDATE_ERROR);
         }
 
-        return new PatchUserDataResDto(true);
+        return new PatchUserPasswordDto(true);
 
     }
 
