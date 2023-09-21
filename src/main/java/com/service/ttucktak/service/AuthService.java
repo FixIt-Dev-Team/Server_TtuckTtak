@@ -40,7 +40,6 @@ public class AuthService {
     /**
      * 회원가입 - 뚝딱 서비스 회원가입
      */
-    @Transactional(rollbackFor = BaseException.class)
     public Member signUp(PostSignUpReqDto data) throws BaseException {
         try {
             // 동일한 아이디가 있는지 확인
@@ -226,6 +225,10 @@ public class AuthService {
                         return memberRepository.save(newMember);
                     });
 
+            if (!member.getAccountType().equals(type)) {
+                throw new BaseException(BaseErrorCode.ALREADY_USED_EMAIL);
+            }
+
             // --- 로그인 처리 ---
             // 토큰을 발급받고, refresh token을 DB에 저장한다.
             TokensDto token = generateToken(member.getUserId(), member.getUserId(), member.getMemberIdx(), data.getUserEmail());
@@ -235,7 +238,9 @@ public class AuthService {
 
             return new PostLoginRes(member.getMemberIdx().toString(), token);
 
-        } catch (Exception e) {
+        }catch (BaseException e){
+            throw e;
+        }catch (Exception e) {
             log.error(e.getMessage());
             throw new BaseException(BaseErrorCode.DATABASE_ERROR);
         }

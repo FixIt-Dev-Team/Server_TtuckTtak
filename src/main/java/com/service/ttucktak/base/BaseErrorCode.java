@@ -20,13 +20,13 @@ public enum BaseErrorCode {
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 닉네임입니다."),
     ID_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 짧습니다."),
     ID_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "유저 아이디가 너무 깁니다."),
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 이메일입니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 이메일 형식 입니다."),
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST.value(), "이메일 형식에 맞지 않습니다."),
     INVALID_BIRTHDAY(HttpStatus.BAD_REQUEST.value(), "생일 형식에 맞지 않습니다 yyyy-MM-dd"),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "이메일 혹은 비밀번호가 틀렸습니다."),
     UUID_ERROR(HttpStatus.BAD_REQUEST.value(), "Idx 값에 오류 발생"),
     NOTICE_REQ_ERROR(HttpStatus.BAD_REQUEST.value(), "현 설정과 동일한 값입니다."),
-    MEMBER_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "해당 이메일을 사용하는 유저가 존재하지 않습니다."),
+    MEMBER_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "계정이 존재하지 않습니다!."),
     MEMBERIDX_NOT_EXIST(HttpStatus.BAD_REQUEST.value(), "유저가 존재하지 않습니다."),
     REFRESH_EXPIRED(HttpStatus.BAD_REQUEST.value(), "리프래시 토큰 만료 재 로그인 바랍니다."),
     INVALID_REFRESH(HttpStatus.BAD_REQUEST.value(), "리프레시 토큰 불일치 재 로그인 바랍니다."),
@@ -49,7 +49,8 @@ public enum BaseErrorCode {
      */
     ALREADY_EXIST_ID(HttpStatus.CONFLICT.value(), "이미 존재하는 아이디입니다."),
     ALREADY_EXIST_NICKNAME(HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
-    ALREADY_EXIST_EMAIL(HttpStatus.CONTINUE.value(), "이미 존재하는 이메일입니다."),
+    ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT.value(), "이미 존재하는 이메일입니다."),
+    ALREADY_USED_EMAIL(HttpStatus.CONFLICT.value(), "이미 사용중인 이메일입니다. 이전에 사용하시던 계정으로 사용해 주세요."),
 
     /**
      * 500 : INTERNAL SERVER ERROR

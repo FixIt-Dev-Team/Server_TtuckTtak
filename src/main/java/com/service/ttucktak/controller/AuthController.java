@@ -62,18 +62,12 @@ public class AuthController {
     })
     @PostMapping("/signup")
     @Transactional
-    public BaseResponse<PostLoginRes> signUp(@RequestBody @Valid PostSignUpReqDto data) {
-        try {
-            // 회원가입한 사용자의 정보를 기반으로 로그인 처리
-            Member newMember = authService.signUp(data);
-            PostLoginRes result = authService.login(newMember, data.getUserPw());
+    public BaseResponse<PostLoginRes> signUp(@RequestBody @Valid PostSignUpReqDto data) throws BaseException{
+        // 회원가입한 사용자의 정보를 기반으로 로그인 처리
+        Member newMember = authService.signUp(data);
+        PostLoginRes result = authService.login(newMember, data.getUserPw());
 
-            return new BaseResponse<>(result);
-
-        } catch (BaseException e) {
-            log.error(e.getMessage());
-            return new BaseResponse<>(e);
-        }
+        return new BaseResponse<>(result);
     }
 
     /**
@@ -87,15 +81,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/login")
-    public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req) {
-        try {
-            PostLoginRes result = authService.login(req.getUserId(), req.getUserPw());
-            return new BaseResponse<>(result);
-
-        } catch (BaseException e) {
-            log.error(e.getMessage());
-            return new BaseResponse<>(e);
-        }
+    public BaseResponse<PostLoginRes> userLogin(@RequestBody PostLoginReq req) throws BaseException{
+        PostLoginRes result = authService.login(req.getUserId(), req.getUserPw());
+        return new BaseResponse<>(result);
     }
 
     /**
@@ -123,20 +111,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/logout")
-    public BaseResponse<PostLogoutRes> userLogout(@RequestBody PostLogoutReq req) {
-        try {
-            UUID userIdx = UUID.fromString(req.getUserIdx());
-            return new BaseResponse<>(authService.logout(userIdx));
-
-        } catch (BaseException e) {
-            e.printStackTrace();
-            return new BaseResponse<>(e);
-        } catch (Exception e) {
-            e.getCause();
-            log.error(e.getMessage());
-            return new BaseResponse<>(new BaseException(BaseErrorCode.UUID_ERROR));
-        }
-
+    public BaseResponse<PostLogoutRes> userLogout(@RequestBody PostLogoutReq req) throws BaseException{
+        UUID userIdx = UUID.fromString(req.getUserIdx());
+        return new BaseResponse<>(authService.logout(userIdx));
     }
 
     /**
@@ -166,6 +143,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "카카오 이메일 동의가 필요합니다.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "이미 사용중인 이메일입니다. 이전에 사용하시던 계정으로 사용해 주세요.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 카카오 로그인 중 오류발생 서버에 문의",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
@@ -187,25 +166,20 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "구글 로그인 중 ID 토큰 검증 실패. 오류 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "이미 사용중인 이메일입니다. 이전에 사용하시던 계정으로 사용해 주세요.",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "500", description = "Database Error | 예상치 못한 에러가 발생하였습니다. | 구글 로그인 중 GoogleIDToken Payload 과정에서 오류 발생. 서버에 문의. | 구글 JWT 토큰 인증 중 구글 시큐리티 문제 발생. | 구글 JWT 토큰 인증 중 IO 문제 발생.",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/oauth2/google")
-    public BaseResponse<PostLoginRes> googleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString) {
+    public BaseResponse<PostLoginRes> googleOauth2(@RequestHeader(CustomHttpHeaders.GOOGLE_ID) String idTokenString) throws BaseException{
 
-        try {
-            GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
+        GoogleIdToken idToken = googleJwtUtil.CheckGoogleIdTokenVerifier(idTokenString);
 
-            if (idToken == null)
-                throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_EXPIRE);
+        if (idToken == null)
+            throw new BaseException(BaseErrorCode.GOOGLE_OAUTH_EXPIRE);
 
-            SocialAccountUserInfo data = oAuthService.getGoogleUserInfo(idToken);
-
-            return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.GOOGLE));
-
-        } catch (BaseException exception) {
-            log.error(exception.getMessage());
-            return new BaseResponse<>(exception);
-        }
+        SocialAccountUserInfo data = oAuthService.getGoogleUserInfo(idToken);
+        return new BaseResponse<>(authService.loginWithSocialAccount(data, AccountType.GOOGLE));
     }
 }
