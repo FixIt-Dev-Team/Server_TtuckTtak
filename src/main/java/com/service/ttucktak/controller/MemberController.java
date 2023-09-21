@@ -243,7 +243,7 @@ public class MemberController {
 
         if(!memberService.isEmailExist(to)) throw new BaseException(BaseErrorCode.MEMBER_NOT_EXIST);
 
-        String addr = "https://ttukttak.store/page/leafs/password/page?email=" + to;
+        String addr = "https://ttukttak.store/page/leafs/password?email=" + to;
         return new BaseResponse<>(new PutPasswordEmailRes(emailService.sendPasswordModify(to, addr)));
 
     }

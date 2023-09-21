@@ -40,7 +40,6 @@ public class AuthService {
     /**
      * 회원가입 - 뚝딱 서비스 회원가입
      */
-    @Transactional(rollbackFor = BaseException.class)
     public Member signUp(PostSignUpReqDto data) throws BaseException {
         try {
             // 동일한 아이디가 있는지 확인

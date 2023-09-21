@@ -20,7 +20,6 @@ public class LeafController {
     /**
      * 타임리프 비밀번호 변경 페이지 API
      * */
-
     @GetMapping("/password")
     public String passwordPage(Model model, @RequestParam("email") String email){
         model.addAttribute("email", email);
