@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@ResponseBody
 @RequestMapping("/page/leafs")
 public class LeafController {
 
@@ -24,6 +23,6 @@ public class LeafController {
     @GetMapping("/password")
     public String passwordPage(Model model, @RequestParam("email") String email){
         model.addAttribute("email", email);
-        return "/modify-password";
+        return "modify-password";
     }
 }
