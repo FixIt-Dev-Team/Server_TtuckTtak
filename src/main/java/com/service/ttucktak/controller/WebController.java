@@ -18,16 +18,16 @@ public class WebController {
      * */
     @GetMapping()
     public String mainPage(){
-        return "/index";
+        return "index";
     }
 
     @GetMapping("/index")
     public String indexPage(){
-        return "/index";
+        return "index";
     }
 
     @GetMapping("/contact")
     public String contactPage(){
-        return "/contact";
+        return "contact";
     }
 }
