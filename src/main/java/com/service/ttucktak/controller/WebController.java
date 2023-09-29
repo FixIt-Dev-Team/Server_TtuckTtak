@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/")
@@ -17,16 +18,16 @@ public class WebController {
      * */
     @GetMapping()
     public String mainPage(){
-        return "/index.html";
+        return "/index";
     }
 
     @GetMapping("/index")
     public String indexPage(){
-        return "/index.html";
+        return "/index";
     }
 
     @GetMapping("/contact")
     public String contactPage(){
-        return "/contact.html";
+        return "/contact";
     }
 }
