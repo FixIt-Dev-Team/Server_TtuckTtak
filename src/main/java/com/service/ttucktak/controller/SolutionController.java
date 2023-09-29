@@ -3,6 +3,7 @@ package com.service.ttucktak.controller;
 import com.service.ttucktak.base.BaseException;
 import com.service.ttucktak.base.BaseResponse;
 import com.service.ttucktak.config.security.CustomHttpHeaders;
+import com.service.ttucktak.dto.member.PatchNoticeResDto;
 import com.service.ttucktak.dto.solution.SolutionDetailReqDto;
 import com.service.ttucktak.dto.solution.SolutionDetailResDto;
 import com.service.ttucktak.dto.solution.SolutionEntryReqDto;
@@ -94,6 +95,24 @@ public class SolutionController {
 
         try{
             return new BaseResponse<>(solutionService.findAndThrowSolution(null,entryIdx));
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception);
+        }
+    }
+
+    @PostMapping("/insert_sol_data")
+    public BaseResponse<PatchNoticeResDto> insertSol(@RequestParam("desc_header")String header,@RequestParam("issue_type")Long type, @RequestParam("level")int level){
+        try{
+            return new BaseResponse<>(solutionService.insertsol(header,type,level));
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception);
+        }
+    }
+
+    @PostMapping("/insert_detail_data")
+    public BaseResponse<PatchNoticeResDto> insertSol(@RequestParam("desc_header")String header,@RequestParam("sub")String sub,@RequestParam("main")String main,@RequestParam("issue_type")int order){
+        try{
+            return new BaseResponse<>(solutionService.insertdetail(header,sub,main,order));
         }catch (BaseException exception){
             return new BaseResponse<>(exception);
         }

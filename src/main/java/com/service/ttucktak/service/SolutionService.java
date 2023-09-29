@@ -2,6 +2,7 @@ package com.service.ttucktak.service;
 
 import com.service.ttucktak.base.BaseErrorCode;
 import com.service.ttucktak.base.BaseException;
+import com.service.ttucktak.dto.member.PatchNoticeResDto;
 import com.service.ttucktak.dto.solution.*;
 import com.service.ttucktak.entity.*;
 import com.service.ttucktak.repository.*;
@@ -166,6 +167,40 @@ public class SolutionService {
                 .subContent(solutionDetail.getSubContent())
                 .build();
 
+    }
+
+    public PatchNoticeResDto insertsol(String header,Long type,int level) throws BaseException {
+        try{
+            Solution tmp = Solution.builder()
+                    .level(level)
+                    .issueType(type)
+                    .descHeader(header).build();
+
+            solutionRepository.save(tmp);
+
+            return new PatchNoticeResDto(true);
+        }catch (Exception e){
+            throw new BaseException(BaseErrorCode.UUID_ERROR);
+        }
+    }
+
+    public PatchNoticeResDto insertdetail(String detailHeader,String subcontent,String content,int order) throws BaseException {
+        try{
+            List<Solution> ptr = solutionRepository.findByIssueTypeAndLevel(Long.valueOf(8),2);
+
+            SolutionDetail tmp = SolutionDetail.builder()
+                    .content(detailHeader)
+                    .solutionOrder(order)
+                    .subContent(subcontent)
+                    .detailHeader(content)
+                    .solutionIdx(ptr.get(0)).build();
+
+            solutionDetailRepository.save(tmp);
+
+            return new PatchNoticeResDto(true);
+        }catch (Exception e){
+            throw new BaseException(BaseErrorCode.UUID_ERROR);
+        }
     }
 
 

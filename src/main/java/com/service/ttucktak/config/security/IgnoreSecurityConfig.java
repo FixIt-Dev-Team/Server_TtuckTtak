@@ -31,6 +31,8 @@ public class IgnoreSecurityConfig {
                 .csrf().disable()// HTTP Basic Authentication 을 사용하지 않음
                 .cors().disable()
                 .authorizeHttpRequests() //Http Request를 인가하라
+                .requestMatchers("/index").permitAll()
+                .requestMatchers("/contact").permitAll()
                 .requestMatchers("/api/auths/signup").permitAll()
                 .requestMatchers("/api/auths/login").permitAll()
                 .requestMatchers("/api/auths/email-confirm").permitAll()
