@@ -1,4 +1,4 @@
-name: test-CI-CD
+name: test-GCP-CI-CD
 
 on:
   push:
@@ -11,30 +11,29 @@ on:
             required: true
             default: 'warning'
          tags:
-            description: 'Test scenario tags'
+            description: 'Testing branch'
             
 permissions:
  id-token: write
  contents: read
 
 env:
-  S3_BUCKET_NAME: ttuckttak
-  RESOURCE_PATH: ./src/main/resources/secret.yml
-  CODE_DEPLOY_APPLICATION_NAME: ttuckttak-code-deploy-dev
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ttuckttak-dev-1
+  PROJECT_ID: "Ttucktak" # TODO: update Google Cloud project id
+  REPOSITORY: "TtucktakRepo" # TODO: update Artifact Registry repository name
+  SERVICE: "TtucktakServer" # TODO: update Cloud Run service name
+  GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
+  GCE_INSTANCE_ZONE: ${{ secrets.GCE_INSTANCE_ZONE}}
 
 jobs:
-  build:
+  build-deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::161761242539:role/Ttuckttak_CI_CD
-          role-session-name: samplerolesession
-          aws-region: ${{ secrets.AWS_REGION }} 
-    
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -42,7 +41,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-        
+
       - name: Set Secret yml file.
         run: touch ./src/main/resources/secret.yml && echo "${{ secrets.SECRETYML }}" > ./src/main/resources/secret.yml && cat ./src/main/resources/secret.yml
 
@@ -50,25 +49,42 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-        # [2]
       - name: Build with Gradle
         run: ./gradlew build
         shell: bash
 
-        # [3]
-      - name: Make zip file
-        run: zip -r ./$GITHUB_SHA.zip .
-        shell: bash
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
 
-        # [5]
-      - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+      # Authenticate Docker to Google Cloud Artifact Registry
+      - name: Docker Auth
+        id: docker-auth
+        uses: 'docker/login-action@v1'
+        with:
+          username: 'wgnwmgm'
+          password: '${{ secrets.WGNW_DOCKER_TOKEN }}'
 
-        # [6]
-      - name: Code Deploy
-        run: | 
-          aws deploy create-deployment \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+
+      - name: Build and Push Container
+        run: |-
+          docker build -t "${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}" ./
+          docker push "${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
+
+      # END - Docker auth and build
+      - name: Deploy
+        run: |-
+          gcloud compute instances update-container "$GCE_INSTANCE" \
+          --zone "$GCE_INSTANCE_ZONE" \
+          --container-image "${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
