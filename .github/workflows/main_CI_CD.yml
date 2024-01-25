@@ -20,7 +20,7 @@ permissions:
 env:
   PROJECT_ID: "Ttucktak" # TODO: update Google Cloud project id
   REPOSITORY: "wgnwmgm" # TODO: update Artifact Registry repository name
-  SERVICE: "TtucktakServer" # TODO: update Cloud Run service name
+  SERVICE: "ttucktak_server" # TODO: update Cloud Run service name
   GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
   GCE_INSTANCE_ZONE: ${{ secrets.GCE_INSTANCE_ZONE}}
 
